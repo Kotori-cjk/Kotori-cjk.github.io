@@ -10,17 +10,17 @@
 ############################
 
 # Name of website
-title: My Website
+title: Kotori's 雲雀崎
 
 # Your name to show in the footer
-author: Some Person
+author: Kotori_cjk
 
 ###############################################
 # --- List of links in the navigation bar --- #
 ###############################################
 
 navbar-links:
-  About Me: "aboutme"
+  About Me: "Fun of Favorite"
   Resources:
     - Beautiful Jekyll: "https://beautifuljekyll.com"
     - Learn markdown: "https://www.markdowntutorial.com/"
@@ -49,11 +49,11 @@ round-avatar: true
 # Select the social network links that you want to show in the footer.
 # Uncomment the links you want to show and add your information to each one.
 social-network-links:
-  email: "someone@example.com"
+  email: "3259617604@qq.com"
   rss: true  # remove this line if you don't want to show an RSS link at the bottom
   facebook: deanattali
-  github: daattali
-  twitter: daattali
+  github: Kotori_cjk
+  twitter: @Kotori_mare
   patreon: DeanAttali
   youtube: c/daattali
 #  medium: yourname
@@ -64,7 +64,7 @@ social-network-links:
 #  snapchat: deanat78
 #  instagram: deanat78
 #  spotify: yourname
-#  telephone: +14159998888
+#  telephone: 15839768559
 #  steam: deanat78
 #  twitch: yourname
 #  yelp: yourname
@@ -91,6 +91,8 @@ share-links-active:
   facebook: true
   linkedin: true
   vk: false
+
+url: "https://你的用户名.github.io
 
 # How to display the link to your website in the footer
 # Remove this if you don't want a link in the footer
