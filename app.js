@@ -548,7 +548,21 @@ function setupEvents() {
   });
 
   // Esc
-  document.addEventListener('keydown', e => { if(e.key==='Escape') closeSettings(); });
+  document.addEventListener('keydown', e => {
+    if (e.key==='Escape') {
+      if (document.body.classList.contains('bg-viewing')) { document.body.classList.remove('bg-viewing'); }
+      else { closeSettings(); }
+    }
+  });
+
+  // Background viewing mode
+  document.getElementById('bg-view-btn').addEventListener('click', () => {
+    if (state.settings.currentBg < 0) { alert('请先在设置中上传背景图片'); return; }
+    document.body.classList.add('bg-viewing');
+  });
+  document.getElementById('bg-view-exit').addEventListener('click', () => {
+    document.body.classList.remove('bg-viewing');
+  });
 }
 
 /* ===== Init ===== */
