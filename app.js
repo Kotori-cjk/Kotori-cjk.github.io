@@ -1,25 +1,32 @@
 const STORAGE_KEY = 'kotori-seika-v1';
 const EMOJIS = ['✿','❀','🌸','⭐','💫','🎀','🦋','🌙'];
+const PARENTS = {
+  math:    { name:'数学', icon:'📐' },
+  physics: { name:'物理', icon:'⚛️' }
+};
 const SUBJECTS = {
-  math:    { name:'数学',   icon:'📐', color:'var(--c-math)' },
-  physics: { name:'物理',   icon:'⚛️', color:'var(--c-physics)' },
-  cs:      { name:'程设',   icon:'💻', color:'var(--c-cs)' },
-  ai:      { name:'AI引论', icon:'🤖', color:'var(--c-ai)' }
+  'math-analysis': { name:'数分', icon:'📊', color:'var(--c-math)', parent:'math' },
+  'math-linalg':   { name:'高代', icon:'📏', color:'var(--c-math)', parent:'math' },
+  'physics-mech':  { name:'力学', icon:'🔧', color:'var(--c-physics)', parent:'physics' },
+  'physics-elec':  { name:'电学', icon:'⚡', color:'var(--c-physics)', parent:'physics' },
+  'cs':            { name:'程设', icon:'💻', color:'var(--c-cs)' },
+  'ai':            { name:'AI引论', icon:'🤖', color:'var(--c-ai)' }
 };
 const SUBJECT_KEYS = Object.keys(SUBJECTS);
 
 /* ===== State ===== */
 let state = {
-  currentView: 'math', // math|physics|cs|ai|tasks
-  notes: { math:{}, physics:{}, cs:{}, ai:{} },
+  currentView: 'math-analysis', // sub-category key
+  notes: { 'math-analysis':{}, 'math-linalg':{}, 'physics-mech':{}, 'physics-elec':{}, cs:{}, ai:{} },
   tasks: [],
   subjectLinks: {
-    math:{ notebookLM:'' }, physics:{ notebookLM:'' },
+    'math-analysis':{ notebookLM:'' }, 'math-linalg':{ notebookLM:'' },
+    'physics-mech':{ notebookLM:'' }, 'physics-elec':{ notebookLM:'' },
     cs:{ notebookLM:'' }, ai:{ notebookLM:'' }
   },
   settings: {
     obsidianVault: 'Obsidian Vault',
-    obsidianFolders: { math:'', physics:'', cs:'', ai:'' },
+    obsidianFolders: { 'math-analysis':'', 'math-linalg':'', 'physics-mech':'', 'physics-elec':'', cs:'', ai:'' },
     musicIds: [],
     backgrounds: [],
     currentBg: -1
@@ -36,6 +43,17 @@ function load() {
         subjectLinks:{...state.subjectLinks,...(p.subjectLinks||{})},
         notes:{...state.notes,...(p.notes||{})}};
       if (!state.tasks) state.tasks = [];
+      // Migrate old math/physics keys to sub-categories
+      if (state.currentView==='math') state.currentView='math-analysis';
+      if (state.currentView==='physics') state.currentView='physics-mech';
+      ['notes','subjectLinks'].forEach(field => {
+        if (state[field].math) { if(!state[field]['math-analysis']) state[field]['math-analysis']=state[field].math; delete state[field].math; }
+        if (state[field].physics) { if(!state[field]['physics-mech']) state[field]['physics-mech']=state[field].physics; delete state[field].physics; }
+      });
+      const of = state.settings.obsidianFolders || {};
+      if (of.math) { if(!of['math-analysis']) of['math-analysis']=of.math; delete of.math; }
+      if (of.physics) { if(!of['physics-mech']) of['physics-mech']=of.physics; delete of.physics; }
+      state.settings.obsidianFolders = of;
       SUBJECT_KEYS.forEach(k => {
         if (!state.notes[k]) state.notes[k] = {};
         if (!state.subjectLinks[k]) state.subjectLinks[k] = { notebookLM:'' };
@@ -119,9 +137,11 @@ function renderSubjectView(subj) {
   const vault = encodeURIComponent(state.settings.obsidianVault);
   const folder = state.settings.obsidianFolders[subj];
   const nlm = state.subjectLinks[subj]?.notebookLM;
+  const parent = s.parent ? PARENTS[s.parent] : null;
+  const heading = parent ? `${parent.icon} ${parent.name} / ${s.icon} ${s.name}` : `${s.icon} ${s.name}`;
 
   sh.className = 'subject-header ' + subj;
-  sh.innerHTML = `<h2>${s.icon} ${s.name}</h2>
+  sh.innerHTML = `<h2>${heading}</h2>
     <div class="subject-links">
       ${folder ? `<a class="link-obsidian" href="obsidian://open?vault=${vault}&file=${encodeURIComponent(folder)}" title="打开Obsidian">📒 Obsidian</a>` : ''}
       ${nlm ? `<a class="link-nlm" href="${escHtml(nlm)}" target="_blank" title="NotebookLM">📓 NotebookLM</a>` : ''}

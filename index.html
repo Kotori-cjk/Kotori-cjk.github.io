@@ -40,8 +40,16 @@
                 <div class="sidebar-section">
                     <h3>📚 学科领域</h3>
                     <div id="subject-nav" class="subject-nav">
-                        <button class="subject-btn active" data-subject="math"><span class="subj-icon">📐</span> 数学</button>
-                        <button class="subject-btn" data-subject="physics"><span class="subj-icon">⚛️</span> 物理</button>
+                        <div class="subject-group">
+                            <div class="subject-group-header">📐 数学</div>
+                            <button class="subject-btn sub active" data-subject="math-analysis"><span class="subj-icon">📊</span> 数分</button>
+                            <button class="subject-btn sub" data-subject="math-linalg"><span class="subj-icon">📏</span> 高代</button>
+                        </div>
+                        <div class="subject-group">
+                            <div class="subject-group-header">⚛️ 物理</div>
+                            <button class="subject-btn sub" data-subject="physics-mech"><span class="subj-icon">🔧</span> 力学</button>
+                            <button class="subject-btn sub" data-subject="physics-elec"><span class="subj-icon">⚡</span> 电学</button>
+                        </div>
                         <button class="subject-btn" data-subject="cs"><span class="subj-icon">💻</span> 程设</button>
                         <button class="subject-btn" data-subject="ai"><span class="subj-icon">🤖</span> AI引论</button>
                         <a class="subject-btn subject-link" href="https://Kotori-cjk.github.io/luogu-journey/" target="_blank"><span class="subj-icon">🏆</span> 算法 ↗</a>
@@ -90,24 +98,32 @@
                     <h3>📒 Obsidian</h3>
                     <label>Vault 名称</label>
                     <input type="text" id="set-obsidian-vault" placeholder="Obsidian Vault">
-                    <label>数学笔记文件夹</label>
-                    <input type="text" id="set-obs-math" placeholder="例：数学">
-                    <label>物理笔记文件夹</label>
-                    <input type="text" id="set-obs-physics" placeholder="例：物理">
-                    <label>程设笔记文件夹</label>
+                    <label>📊 数分 笔记文件夹</label>
+                    <input type="text" id="set-obs-math-analysis" placeholder="例：数分">
+                    <label>📏 高代 笔记文件夹</label>
+                    <input type="text" id="set-obs-math-linalg" placeholder="例：高代">
+                    <label>🔧 力学 笔记文件夹</label>
+                    <input type="text" id="set-obs-physics-mech" placeholder="例：力学">
+                    <label>⚡ 电学 笔记文件夹</label>
+                    <input type="text" id="set-obs-physics-elec" placeholder="例：电学">
+                    <label>💻 程设 笔记文件夹</label>
                     <input type="text" id="set-obs-cs" placeholder="例：程设">
-                    <label>AI引论笔记文件夹</label>
+                    <label>🤖 AI引论 笔记文件夹</label>
                     <input type="text" id="set-obs-ai" placeholder="例：AI引论">
                 </div>
                 <div class="settings-group">
                     <h3>🔗 NotebookLM 链接</h3>
-                    <label>数学</label>
-                    <input type="text" id="set-nlm-math" placeholder="NotebookLM URL">
-                    <label>物理</label>
-                    <input type="text" id="set-nlm-physics" placeholder="NotebookLM URL">
-                    <label>程设</label>
+                    <label>📊 数分</label>
+                    <input type="text" id="set-nlm-math-analysis" placeholder="NotebookLM URL">
+                    <label>📏 高代</label>
+                    <input type="text" id="set-nlm-math-linalg" placeholder="NotebookLM URL">
+                    <label>🔧 力学</label>
+                    <input type="text" id="set-nlm-physics-mech" placeholder="NotebookLM URL">
+                    <label>⚡ 电学</label>
+                    <input type="text" id="set-nlm-physics-elec" placeholder="NotebookLM URL">
+                    <label>💻 程设</label>
                     <input type="text" id="set-nlm-cs" placeholder="NotebookLM URL">
-                    <label>AI引论</label>
+                    <label>🤖 AI引论</label>
                     <input type="text" id="set-nlm-ai" placeholder="NotebookLM URL">
                 </div>
                 <div class="settings-group">

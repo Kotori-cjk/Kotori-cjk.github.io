@@ -48,6 +48,9 @@ body { font-family:var(--font-body); color:var(--text); background:var(--bg); mi
 
 /* SUBJECT NAV */
 .subject-nav { display:flex; flex-direction:column; gap:6px; }
+.subject-group { margin-bottom:4px; }
+.subject-group-header { font-family:var(--font-cute); font-size:13px; color:var(--text-light); padding:4px 8px; margin-bottom:4px; }
+.subject-btn.sub { padding-left:24px; font-size:13px; }
 .subject-btn { display:flex; align-items:center; gap:8px; padding:12px 14px; border:2px solid var(--border); border-radius:var(--radius-xs); background:#fff; cursor:pointer; font-family:var(--font-body); font-size:14px; color:var(--text); transition:all .25s; text-decoration:none; }
 .subject-btn:hover { border-color:var(--primary-light); transform:translateX(3px); }
 .subject-btn.active { background:linear-gradient(135deg,var(--primary),var(--secondary)); color:#fff; border-color:transparent; box-shadow:0 3px 12px rgba(255,107,157,.3); }
@@ -70,12 +73,12 @@ body { font-family:var(--font-body); color:var(--text); background:var(--bg); mi
 /* SUBJECT HEADER */
 .subject-header { background:var(--card); border-radius:var(--radius); padding:20px 24px; margin-bottom:20px; box-shadow:var(--shadow); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; }
 .subject-header h2 { font-family:var(--font-cute); font-size:24px; }
-.subject-header.math h2 { color:var(--c-math); }
-.subject-header.physics h2 { color:var(--c-physics); }
+.subject-header.math-analysis h2, .subject-header.math-linalg h2 { color:var(--c-math); }
+.subject-header.physics-mech h2, .subject-header.physics-elec h2 { color:var(--c-physics); }
 .subject-header.cs h2 { color:var(--c-cs); }
 .subject-header.ai h2 { color:var(--c-ai); }
-.subject-header.math { border-left:5px solid var(--c-math); }
-.subject-header.physics { border-left:5px solid var(--c-physics); }
+.subject-header.math-analysis, .subject-header.math-linalg { border-left:5px solid var(--c-math); }
+.subject-header.physics-mech, .subject-header.physics-elec { border-left:5px solid var(--c-physics); }
 .subject-header.cs { border-left:5px solid var(--c-cs); }
 .subject-header.ai { border-left:5px solid var(--c-ai); }
 .subject-links { display:flex; gap:8px; }
