@@ -14,9 +14,54 @@ const SUBJECTS = {
 };
 const SUBJECT_KEYS = Object.keys(SUBJECTS);
 
+/* ===== IndexedDB Image Store (50MB+) ===== */
+const IDB_NAME = 'kotori-seika-images';
+const IDB_STORE = 'images';
+let idb = null;
+let imageCache = {}; // key → dataURL, loaded on init
+
+function idbOpen() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(IDB_NAME, 1);
+    req.onupgradeneeded = e => e.target.result.createObjectStore(IDB_STORE);
+    req.onsuccess = e => { idb = e.target.result; resolve(); };
+    req.onerror = e => reject(e.target.error);
+  });
+}
+function idbPut(key, data) {
+  return new Promise((resolve, reject) => {
+    const tx = idb.transaction(IDB_STORE, 'readwrite');
+    tx.objectStore(IDB_STORE).put(data, key);
+    tx.oncomplete = resolve;
+    tx.onerror = e => reject(e.target.error);
+  });
+}
+function idbDel(key) {
+  return new Promise((resolve, reject) => {
+    const tx = idb.transaction(IDB_STORE, 'readwrite');
+    tx.objectStore(IDB_STORE).delete(key);
+    tx.oncomplete = resolve;
+    tx.onerror = e => reject(e.target.error);
+  });
+}
+function idbGetAll() {
+  return new Promise((resolve, reject) => {
+    const tx = idb.transaction(IDB_STORE, 'readonly');
+    const store = tx.objectStore(IDB_STORE);
+    const req = store.openCursor();
+    const result = {};
+    req.onsuccess = e => {
+      const c = e.target.result;
+      if (c) { result[c.key] = c.value; c.continue(); }
+      else resolve(result);
+    };
+    req.onerror = e => reject(e.target.error);
+  });
+}
+
 /* ===== State ===== */
 let state = {
-  currentView: 'math-analysis', // sub-category key
+  currentView: 'math-analysis',
   notes: { 'math-analysis':{}, 'math-linalg':{}, 'physics-mech':{}, 'physics-elec':{}, cs:{}, ai:{} },
   tasks: [],
   subjectLinks: {
@@ -35,8 +80,7 @@ let state = {
 
 function save() {
   try {
-    const data = JSON.stringify(state);
-    localStorage.setItem(STORAGE_KEY, data);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     updateSaveStatus(true);
   } catch(e) {
     console.warn('Save failed', e);
@@ -67,7 +111,6 @@ function load() {
         subjectLinks:{...state.subjectLinks,...(p.subjectLinks||{})},
         notes:{...state.notes,...(p.notes||{})}};
       if (!state.tasks) state.tasks = [];
-      // Migrate old math/physics keys to sub-categories
       if (state.currentView==='math') state.currentView='math-analysis';
       if (state.currentView==='physics') state.currentView='physics-mech';
       ['notes','subjectLinks'].forEach(field => {
@@ -87,7 +130,46 @@ function load() {
   } catch(e) { console.warn('Load failed',e); }
 }
 
-/* ===== Utils (reused) ===== */
+/* ===== Migrate old base64 data into IndexedDB ===== */
+async function migrateImages() {
+  let changed = false;
+  // Backgrounds: move base64 → IndexedDB key
+  for (let i = 0; i < state.settings.backgrounds.length; i++) {
+    const val = state.settings.backgrounds[i];
+    if (val && val.startsWith('data:')) {
+      const key = 'bg_' + uid();
+      await idbPut(key, val);
+      imageCache[key] = val;
+      state.settings.backgrounds[i] = key;
+      changed = true;
+    }
+  }
+  // Note images: replace inline data:image URLs with idb: references
+  for (const subj of SUBJECT_KEYS) {
+    for (const date of Object.keys(state.notes[subj] || {})) {
+      for (const note of (state.notes[subj][date] || [])) {
+        if (note.content && note.content.includes('](data:image')) {
+          const re = /!\[([^\]]*)\]\((data:image[^)]+)\)/g;
+          const replacements = [];
+          let m;
+          while ((m = re.exec(note.content)) !== null) {
+            const key = 'note_' + uid();
+            await idbPut(key, m[2]);
+            imageCache[key] = m[2];
+            replacements.push([m[0], `![${m[1]}](idb:${key})`]);
+          }
+          for (const [from, to] of replacements) {
+            note.content = note.content.replace(from, to);
+          }
+          if (replacements.length) changed = true;
+        }
+      }
+    }
+  }
+  if (changed) save();
+}
+
+/* ===== Utils ===== */
 function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function now() { return new Date().toLocaleString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}); }
 function today() { return new Date().toISOString().slice(0,10); }
@@ -98,6 +180,8 @@ function uid() { return ''+(nextId++); }
 
 function renderMarkdown(text) {
   if (!text) return '';
+  // Resolve idb: image references from cache
+  text = text.replace(/\(idb:([^)]+)\)/g, (m, key) => '(' + (imageCache[key] || '#') + ')');
   if (typeof marked !== 'undefined') { marked.setOptions({breaks:true,gfm:true}); return marked.parse(text); }
   return escHtml(text).replace(/\n/g,'<br>');
 }
@@ -112,10 +196,16 @@ function compressImage(file, maxW, q) {
     }; img.src=e.target.result; }; reader.readAsDataURL(file);
   });
 }
-function insertImageAtCursor(ta, url) {
+async function saveImageToIDB(dataUrl) {
+  const key = 'img_' + uid();
+  await idbPut(key, dataUrl);
+  imageCache[key] = dataUrl;
+  return key;
+}
+function insertImageAtCursor(ta, ref) {
   const pos = ta.selectionStart||ta.value.length;
   const before = ta.value.substring(0,pos), after = ta.value.substring(ta.selectionEnd||pos);
-  ta.value = before + (before.endsWith('\n')||!before?'':'\n') + `![image](${url})\n` + after;
+  ta.value = before + (before.endsWith('\n')||!before?'':'\n') + `![image](${ref})\n` + after;
   ta.dispatchEvent(new Event('input',{bubbles:true}));
 }
 
@@ -183,11 +273,9 @@ function renderNotes(subj) {
   const todayStr = today();
   const dates = Object.keys(notes).sort().reverse();
 
-  // Count all notes
   let totalNotes = 0;
   dates.forEach(d => { totalNotes += (notes[d]||[]).length; });
 
-  // Input area with title
   let html = `<div class="note-input-area">
     <h4>📝 写笔记</h4>
     <input type="text" id="note-title-input" class="note-title-input" placeholder="标题（知识点名称）...">
@@ -202,7 +290,6 @@ function renderNotes(subj) {
     </div>
   </div>`;
 
-  // Catalog
   if (totalNotes > 0) {
     html += `<div class="catalog-card">
       <div class="catalog-header" id="catalog-toggle">
@@ -225,7 +312,6 @@ function renderNotes(subj) {
     html += `</div></div>`;
   }
 
-  // Notes grouped by date
   if (!totalNotes) {
     html += `<div class="task-empty"><div class="big-icon">📝</div><p>还没有笔记，写下你的第一条吧~</p></div>`;
   }
@@ -276,7 +362,6 @@ function renderTaskView() {
     </div>
   </div>`;
 
-  // Group by date
   const byDate = {};
   state.tasks.forEach((t,i) => {
     if (!byDate[t.date]) byDate[t.date] = [];
@@ -313,15 +398,18 @@ function renderTaskView() {
 function applyBackground() {
   const bg = document.getElementById('bg-layer');
   const idx = state.settings.currentBg, bgs = state.settings.backgrounds;
-  if (idx>=0 && bgs[idx]) { bg.style.backgroundImage=`url(${bgs[idx]})`; bg.classList.add('has-bg'); }
-  else { bg.style.backgroundImage=''; bg.classList.remove('has-bg'); }
+  if (idx>=0 && bgs[idx]) {
+    const data = imageCache[bgs[idx]] || bgs[idx]; // key from cache, or legacy raw data
+    bg.style.backgroundImage=`url(${data})`; bg.classList.add('has-bg');
+  } else { bg.style.backgroundImage=''; bg.classList.remove('has-bg'); }
 }
 function renderBgPreviews() {
   const el = document.getElementById('bg-preview-list');
-  el.innerHTML = state.settings.backgrounds.map((url,i) =>
-    `<div class="bg-preview-item${state.settings.currentBg===i?' active':''}" data-bg-select="${i}">
-      <img src="${url}" alt="bg"><button class="bg-preview-delete" data-bg-del="${i}">✕</button></div>`
-  ).join('');
+  el.innerHTML = state.settings.backgrounds.map((key,i) => {
+    const src = imageCache[key] || key;
+    return `<div class="bg-preview-item${state.settings.currentBg===i?' active':''}" data-bg-select="${i}">
+      <img src="${src}" alt="bg"><button class="bg-preview-delete" data-bg-del="${i}">✕</button></div>`;
+  }).join('');
 }
 
 /* ===== Music ===== */
@@ -373,17 +461,28 @@ function updateObsidianLink() {
   document.getElementById('obsidian-link').href = `obsidian://open?vault=${vault}`;
 }
 
-/* ===== Export / Import ===== */
-function exportData() {
-  const blob = new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+/* ===== Export / Import (includes IndexedDB images) ===== */
+async function exportData() {
+  const allImages = await idbGetAll();
+  const exportObj = { ...state, _images: allImages };
+  const blob = new Blob([JSON.stringify(exportObj,null,2)],{type:'application/json'});
   const a = document.createElement('a'); a.href=URL.createObjectURL(blob);
   a.download='kotori-seika-backup.json'; a.click(); URL.revokeObjectURL(a.href);
+  showToast('📤 导出成功（含全部图片）');
 }
-function importData(file) {
+async function importData(file) {
   const reader = new FileReader();
-  reader.onload = e => {
+  reader.onload = async e => {
     try {
       const d=JSON.parse(e.target.result);
+      // Restore images to IndexedDB
+      if (d._images) {
+        for (const [key, data] of Object.entries(d._images)) {
+          await idbPut(key, data);
+          imageCache[key] = data;
+        }
+        delete d._images;
+      }
       state={...state,...d,settings:{...state.settings,...(d.settings||{})},
         subjectLinks:{...state.subjectLinks,...(d.subjectLinks||{})},
         notes:{...state.notes,...(d.notes||{})}};
@@ -405,25 +504,21 @@ function setupEvents() {
     if (taskBtn) { state.currentView = 'tasks'; save(); renderAll(); }
   });
 
-  // ---- Notes view events (delegated on view-notes) ----
   const vn = document.getElementById('view-notes');
 
   vn.addEventListener('click', e => {
-    // Catalog scroll
     const scrollEntry = e.target.closest('[data-scroll-to]');
     if (scrollEntry) {
       const target = document.getElementById('note-anchor-' + scrollEntry.dataset.scrollTo);
       if (target) {
         target.scrollIntoView({behavior:'smooth', block:'start'});
         target.classList.remove('note-highlight');
-        // retrigger animation
         void target.offsetWidth;
         target.classList.add('note-highlight');
         setTimeout(() => target.classList.remove('note-highlight'), 1700);
       }
       return;
     }
-    // Catalog toggle
     if (e.target.closest('#catalog-toggle')) {
       const body = document.getElementById('catalog-body');
       const caret = document.querySelector('.catalog-caret');
@@ -431,7 +526,6 @@ function setupEvents() {
       if (caret) caret.textContent = collapsed ? '▶' : '▼';
       return;
     }
-    // Submit note
     if (e.target.id === 'note-submit-btn') {
       const titleInput = document.getElementById('note-title-input');
       const ta = document.getElementById('note-textarea');
@@ -447,7 +541,6 @@ function setupEvents() {
       if (ti) ti.focus();
       return;
     }
-    // Preview toggle
     if (e.target.id === 'note-preview-btn') {
       const ta = document.getElementById('note-textarea');
       const pv = document.getElementById('note-preview');
@@ -459,7 +552,6 @@ function setupEvents() {
       }
       return;
     }
-    // Delete note
     const del = e.target.closest('[data-note-del]');
     if (del) {
       const d = JSON.parse(del.dataset.noteDel);
@@ -471,25 +563,24 @@ function setupEvents() {
     }
   });
 
-  // Image upload
+  // Image upload → IndexedDB
   vn.addEventListener('change', e => {
     if (e.target.id === 'note-img-input' && e.target.files[0]) {
-      compressImage(e.target.files[0]).then(url => {
+      compressImage(e.target.files[0]).then(async dataUrl => {
+        const key = await saveImageToIDB(dataUrl);
         const ta = document.getElementById('note-textarea');
-        if (ta) insertImageAtCursor(ta, url);
+        if (ta) insertImageAtCursor(ta, 'idb:' + key);
         e.target.value = '';
       });
     }
   });
 
-  // Catalog search filter
   vn.addEventListener('input', e => {
     if (e.target.id === 'catalog-search') {
       const q = e.target.value.toLowerCase();
       document.querySelectorAll('.catalog-entry').forEach(el => {
         el.style.display = el.textContent.toLowerCase().includes(q) ? '' : 'none';
       });
-      // Hide empty date groups
       document.querySelectorAll('.catalog-date-group').forEach(g => {
         const hasVisible = Array.from(g.querySelectorAll('.catalog-entry')).some(e => e.style.display !== 'none');
         g.style.display = hasVisible ? '' : 'none';
@@ -497,7 +588,7 @@ function setupEvents() {
     }
   });
 
-  // Image paste
+  // Image paste → IndexedDB
   vn.addEventListener('paste', async e => {
     if (!e.target.matches || !e.target.matches('#note-textarea')) return;
     const items = e.clipboardData && e.clipboardData.items;
@@ -505,18 +596,17 @@ function setupEvents() {
     for (let i=0;i<items.length;i++) {
       if (items[i].type.indexOf('image')!==-1) {
         e.preventDefault();
-        const url = await compressImage(items[i].getAsFile());
-        insertImageAtCursor(e.target, url);
+        const dataUrl = await compressImage(items[i].getAsFile());
+        const key = await saveImageToIDB(dataUrl);
+        insertImageAtCursor(e.target, 'idb:' + key);
         break;
       }
     }
   });
 
-  // ---- Task view events (delegated on view-tasks) ----
+  // Task view
   const vt = document.getElementById('view-tasks');
-
   vt.addEventListener('click', e => {
-    // Add task
     if (e.target.id === 'task-add-btn') {
       const title = document.getElementById('task-title-input').value.trim();
       if (!title) return;
@@ -526,32 +616,24 @@ function setupEvents() {
       save(); renderAll();
       return;
     }
-    // Toggle done
     const tog = e.target.closest('[data-task-toggle]');
-    if (tog) {
-      const idx = +tog.dataset.taskToggle;
-      state.tasks[idx].done = !state.tasks[idx].done;
-      save(); renderAll(); return;
-    }
-    // Delete task
+    if (tog) { const idx=+tog.dataset.taskToggle; state.tasks[idx].done=!state.tasks[idx].done; save(); renderAll(); return; }
     const del = e.target.closest('[data-task-del]');
-    if (del) {
-      state.tasks.splice(+del.dataset.taskDel, 1);
-      save(); renderAll();
-    }
+    if (del) { state.tasks.splice(+del.dataset.taskDel,1); save(); renderAll(); }
   });
 
-  // ---- Settings ----
+  // Settings
   document.getElementById('settings-btn').addEventListener('click', openSettings);
   document.querySelector('.modal-close').addEventListener('click', closeSettings);
   document.querySelector('.modal-overlay').addEventListener('click', closeSettings);
 
-  // Background
+  // Background upload → IndexedDB
   document.getElementById('bg-upload').addEventListener('change', e => {
     Array.from(e.target.files).forEach(file => {
       const reader = new FileReader();
-      reader.onload = ev => {
-        state.settings.backgrounds.push(ev.target.result);
+      reader.onload = async ev => {
+        const key = await saveImageToIDB(ev.target.result);
+        state.settings.backgrounds.push(key);
         if (state.settings.currentBg<0) state.settings.currentBg=0;
         save(); applyBackground(); renderBgPreviews();
       }; reader.readAsDataURL(file);
@@ -564,7 +646,11 @@ function setupEvents() {
     }
     const del = e.target.closest('[data-bg-del]');
     if (del) {
-      const i=+del.dataset.bgDel; state.settings.backgrounds.splice(i,1);
+      const i=+del.dataset.bgDel;
+      const key = state.settings.backgrounds[i];
+      if (key && !key.startsWith('data:')) idbDel(key).catch(()=>{});
+      delete imageCache[key];
+      state.settings.backgrounds.splice(i,1);
       if(state.settings.currentBg>=state.settings.backgrounds.length) state.settings.currentBg=state.settings.backgrounds.length-1;
       save(); applyBackground(); renderBgPreviews();
     }
@@ -586,20 +672,18 @@ function setupEvents() {
   });
 
   // Export / Import
-  document.getElementById('export-btn').addEventListener('click', exportData);
+  document.getElementById('export-btn').addEventListener('click', () => exportData());
   document.getElementById('import-file').addEventListener('change', e => {
     if (e.target.files[0]) importData(e.target.files[0]); e.target.value='';
   });
 
-  // Esc
+  // Esc + bg viewing
   document.addEventListener('keydown', e => {
     if (e.key==='Escape') {
       if (document.body.classList.contains('bg-viewing')) { document.body.classList.remove('bg-viewing'); }
       else { closeSettings(); }
     }
   });
-
-  // Background viewing mode
   document.getElementById('bg-view-btn').addEventListener('click', () => {
     if (state.settings.currentBg < 0) { alert('请先在设置中上传背景图片'); return; }
     document.body.classList.add('bg-viewing');
@@ -609,18 +693,19 @@ function setupEvents() {
   });
 }
 
-/* ===== Init ===== */
-function init() {
+/* ===== Init (async: opens IndexedDB first) ===== */
+async function init() {
+  await idbOpen();
+  imageCache = await idbGetAll();
   load();
+  await migrateImages();
   initParticles();
   updateObsidianLink();
   applyBackground();
   renderMusic();
   setupEvents();
   renderAll();
-  // Auto-save on page close
   window.addEventListener('beforeunload', () => save());
-  // Periodic auto-save every 30s
   setInterval(save, 30000);
 }
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', () => init());
