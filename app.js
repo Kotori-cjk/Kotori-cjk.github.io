@@ -137,10 +137,16 @@ function renderNotes(subj) {
   const el = document.getElementById('view-notes');
   const notes = state.notes[subj] || {};
   const todayStr = today();
+  const dates = Object.keys(notes).sort().reverse();
 
-  // Input area
+  // Count all notes
+  let totalNotes = 0;
+  dates.forEach(d => { totalNotes += (notes[d]||[]).length; });
+
+  // Input area with title
   let html = `<div class="note-input-area">
     <h4>📝 写笔记</h4>
+    <input type="text" id="note-title-input" class="note-title-input" placeholder="标题（知识点名称）...">
     <div class="note-toolbar">
       <button class="note-tool-btn" id="note-preview-btn">👁 预览</button>
       <label class="note-tool-btn">📷 贴图<input type="file" accept="image/*" id="note-img-input"></label>
@@ -152,19 +158,42 @@ function renderNotes(subj) {
     </div>
   </div>`;
 
-  // Notes grouped by date (newest first)
-  const dates = Object.keys(notes).sort().reverse();
-  if (!dates.length) {
+  // Catalog
+  if (totalNotes > 0) {
+    html += `<div class="catalog-card">
+      <div class="catalog-header" id="catalog-toggle">
+        <h4>📑 笔记目录 (${totalNotes})</h4>
+        <span class="catalog-caret">▼</span>
+      </div>
+      <div class="catalog-body" id="catalog-body">
+        <input type="text" class="catalog-search" id="catalog-search" placeholder="搜索标题...">`;
+    dates.forEach(date => {
+      const dayNotes = notes[date] || [];
+      if (!dayNotes.length) return;
+      const label = date===todayStr ? `今天 (${date})` : date;
+      html += `<div class="catalog-date-group"><div class="catalog-date-label">📅 ${label}</div>`;
+      dayNotes.slice().reverse().forEach(n => {
+        const t = n.title || n.content?.substring(0,20) || '无标题';
+        html += `<a class="catalog-entry" data-scroll-to="${n.id}">→ ${escHtml(t)}</a>`;
+      });
+      html += `</div>`;
+    });
+    html += `</div></div>`;
+  }
+
+  // Notes grouped by date
+  if (!totalNotes) {
     html += `<div class="task-empty"><div class="big-icon">📝</div><p>还没有笔记，写下你的第一条吧~</p></div>`;
   }
   dates.forEach(date => {
     const dayNotes = notes[date];
     if (!dayNotes || !dayNotes.length) return;
-    const label = date === todayStr ? `📅 今天 (${date})` : `📅 ${date}`;
+    const label = date===todayStr ? `📅 今天 (${date})` : `📅 ${date}`;
     html += `<div class="note-date-group"><div class="note-date-label">${label}</div>`;
     dayNotes.slice().reverse().forEach((n,i) => {
       const realIdx = dayNotes.length - 1 - i;
-      html += `<div class="note-card">
+      html += `<div class="note-card" id="note-anchor-${n.id}">
+        ${n.title ? `<div class="note-title-heading">${escHtml(n.title)}</div>` : ''}
         <div class="note-time">${n.time}</div>
         <div class="note-body">${renderMarkdown(n.content)}</div>
         <button class="note-delete" data-note-del='${JSON.stringify({subj,date,idx:realIdx})}'>✕</button>
@@ -336,16 +365,42 @@ function setupEvents() {
   const vn = document.getElementById('view-notes');
 
   vn.addEventListener('click', e => {
+    // Catalog scroll
+    const scrollEntry = e.target.closest('[data-scroll-to]');
+    if (scrollEntry) {
+      const target = document.getElementById('note-anchor-' + scrollEntry.dataset.scrollTo);
+      if (target) {
+        target.scrollIntoView({behavior:'smooth', block:'start'});
+        target.classList.remove('note-highlight');
+        // retrigger animation
+        void target.offsetWidth;
+        target.classList.add('note-highlight');
+        setTimeout(() => target.classList.remove('note-highlight'), 1700);
+      }
+      return;
+    }
+    // Catalog toggle
+    if (e.target.closest('#catalog-toggle')) {
+      const body = document.getElementById('catalog-body');
+      const caret = document.querySelector('.catalog-caret');
+      const collapsed = body.classList.toggle('collapsed');
+      if (caret) caret.textContent = collapsed ? '▶' : '▼';
+      return;
+    }
     // Submit note
     if (e.target.id === 'note-submit-btn') {
+      const titleInput = document.getElementById('note-title-input');
       const ta = document.getElementById('note-textarea');
+      const title = titleInput ? titleInput.value.trim() : '';
       const content = ta.value.trim();
-      if (!content) return;
+      if (!content && !title) return;
       const subj = state.currentView;
       const d = today();
       if (!state.notes[subj][d]) state.notes[subj][d] = [];
-      state.notes[subj][d].push({ id:uid(), content, time:now() });
+      state.notes[subj][d].push({ id:uid(), title, content, time:now() });
       save(); renderNotes(subj);
+      const ti = document.getElementById('note-title-input');
+      if (ti) ti.focus();
       return;
     }
     // Preview toggle
@@ -379,6 +434,21 @@ function setupEvents() {
         const ta = document.getElementById('note-textarea');
         if (ta) insertImageAtCursor(ta, url);
         e.target.value = '';
+      });
+    }
+  });
+
+  // Catalog search filter
+  vn.addEventListener('input', e => {
+    if (e.target.id === 'catalog-search') {
+      const q = e.target.value.toLowerCase();
+      document.querySelectorAll('.catalog-entry').forEach(el => {
+        el.style.display = el.textContent.toLowerCase().includes(q) ? '' : 'none';
+      });
+      // Hide empty date groups
+      document.querySelectorAll('.catalog-date-group').forEach(g => {
+        const hasVisible = Array.from(g.querySelectorAll('.catalog-entry')).some(e => e.style.display !== 'none');
+        g.style.display = hasVisible ? '' : 'none';
       });
     }
   });
