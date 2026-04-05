@@ -33,7 +33,31 @@ let state = {
   }
 };
 
-function save() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) { console.warn('Save failed',e); } }
+function save() {
+  try {
+    const data = JSON.stringify(state);
+    localStorage.setItem(STORAGE_KEY, data);
+    updateSaveStatus(true);
+  } catch(e) {
+    console.warn('Save failed', e);
+    updateSaveStatus(false);
+    showToast('⚠ 保存失败：存储空间可能不足（' + Math.round(JSON.stringify(state).length/1024) + 'KB），建议导出备份');
+  }
+}
+function updateSaveStatus(ok) {
+  const el = document.getElementById('save-indicator');
+  if (!el) return;
+  const t = new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  el.textContent = ok ? `💾 已保存 ${t}` : '⚠ 保存失败';
+  el.className = 'save-indicator ' + (ok ? 'ok' : 'err');
+}
+function showToast(msg) {
+  const el = document.getElementById('save-toast');
+  if (!el) return;
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 5000);
+}
 function load() {
   try {
     const d = localStorage.getItem(STORAGE_KEY);
@@ -594,5 +618,9 @@ function init() {
   renderMusic();
   setupEvents();
   renderAll();
+  // Auto-save on page close
+  window.addEventListener('beforeunload', () => save());
+  // Periodic auto-save every 30s
+  setInterval(save, 30000);
 }
 document.addEventListener('DOMContentLoaded', init);

@@ -236,6 +236,13 @@ body.bg-viewing .bg-view-exit { display:flex; }
 .bg-view-btn { display:inline-flex; align-items:center; gap:4px; padding:8px 14px; background:rgba(255,255,255,.2); border:1px solid rgba(255,255,255,.3); border-radius:var(--radius-xs); color:#fff; font-size:13px; font-family:var(--font-body); cursor:pointer; transition:all .25s; white-space:nowrap; }
 .bg-view-btn:hover { background:rgba(255,255,255,.35); transform:translateY(-1px); }
 
+/* SAVE INDICATOR & TOAST */
+.save-indicator { font-size:12px; color:var(--text-light); padding:8px 10px; text-align:center; border-top:1px dashed var(--border); margin-top:auto; }
+.save-indicator.ok { color:var(--mint); }
+.save-indicator.err { color:var(--danger); font-weight:500; }
+.save-toast { position:fixed; bottom:24px; right:24px; padding:12px 22px; border-radius:var(--radius-sm); font-size:13px; font-family:var(--font-body); z-index:999; background:var(--danger); color:#fff; box-shadow:0 6px 24px rgba(255,107,107,.35); opacity:0; transform:translateY(12px); transition:all .35s; pointer-events:none; }
+.save-toast.show { opacity:1; transform:translateY(0); pointer-events:auto; }
+
 /* SCROLLBAR */
 ::-webkit-scrollbar { width:6px; }
 ::-webkit-scrollbar-track { background:transparent; }
