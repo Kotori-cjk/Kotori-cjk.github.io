@@ -185,6 +185,19 @@ function renderMarkdown(text) {
   if (typeof marked !== 'undefined') { marked.setOptions({breaks:true,gfm:true}); return marked.parse(text); }
   return escHtml(text).replace(/\n/g,'<br>');
 }
+function renderLatex(root) {
+  if (!root || typeof renderMathInElement === 'undefined') return;
+  renderMathInElement(root, {
+    delimiters: [
+      { left: '$$', right: '$$', display: true },
+      { left: '\\[', right: '\\]', display: true },
+      { left: '$', right: '$', display: false },
+      { left: '\\(', right: '\\)', display: false }
+    ],
+    ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+    throwOnError: false
+  });
+}
 function compressImage(file, maxW, q) {
   maxW=maxW||800; q=q||0.7;
   return new Promise(r => {
@@ -333,6 +346,7 @@ function renderNotes(subj) {
   });
 
   el.innerHTML = html;
+  renderLatex(el);
 }
 
 /* ===== Task View ===== */
@@ -545,7 +559,7 @@ function setupEvents() {
       const ta = document.getElementById('note-textarea');
       const pv = document.getElementById('note-preview');
       if (pv.style.display==='none') {
-        pv.innerHTML=renderMarkdown(ta.value); pv.style.display='block'; ta.style.display='none';
+        pv.innerHTML=renderMarkdown(ta.value); renderLatex(pv); pv.style.display='block'; ta.style.display='none';
         e.target.textContent='✏️ 编辑';
       } else {
         pv.style.display='none'; ta.style.display=''; e.target.textContent='👁 预览';

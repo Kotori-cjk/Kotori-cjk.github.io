@@ -101,6 +101,8 @@ body { font-family:var(--font-body); color:var(--text); background:var(--bg); mi
 .note-body code { background:#f0f0f5; padding:1px 5px; border-radius:4px; font-size:13px; }
 .note-body pre { background:#f0f0f5; padding:12px; border-radius:var(--radius-xs); overflow-x:auto; margin:8px 0; }
 .note-body pre code { background:none; padding:0; }
+.note-body .katex-display, .note-preview .katex-display { overflow-x:auto; overflow-y:hidden; padding:4px 0; }
+.note-body .katex, .note-preview .katex { color:var(--text); font-size:1.04em; }
 .note-body h1,.note-body h2,.note-body h3 { font-family:var(--font-cute); color:var(--primary-dark); margin:12px 0 6px; }
 .note-body blockquote { border-left:3px solid var(--primary-light); padding-left:12px; color:var(--text-light); margin:8px 0; }
 .note-body ul,.note-body ol { padding-left:20px; margin:8px 0; }
