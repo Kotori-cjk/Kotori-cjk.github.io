@@ -335,9 +335,14 @@ function renderNotes(subj) {
     html += `<div class="note-date-group"><div class="note-date-label">${label}</div>`;
     dayNotes.slice().reverse().forEach((n,i) => {
       const realIdx = dayNotes.length - 1 - i;
-      html += `<div class="note-card" id="note-anchor-${n.id}">
-        ${n.title ? `<div class="note-title-heading">${escHtml(n.title)}</div>` : ''}
-        <div class="note-time">${n.time}</div>
+      html += `<div class="note-card${n.collapsed ? ' collapsed' : ''}" id="note-anchor-${n.id}">
+        <div class="note-card-head">
+          <div>
+            ${n.title ? `<div class="note-title-heading">${escHtml(n.title)}</div>` : ''}
+            <div class="note-time">${n.time}</div>
+          </div>
+          <button class="note-fold" data-note-fold='${JSON.stringify({subj,date,idx:realIdx})}'>${n.collapsed ? '展开' : '折叠'}</button>
+        </div>
         <div class="note-body">${renderMarkdown(n.content)}</div>
         <button class="note-delete" data-note-del='${JSON.stringify({subj,date,idx:realIdx})}'>✕</button>
       </div>`;
@@ -572,6 +577,15 @@ function setupEvents() {
       if (state.notes[d.subj] && state.notes[d.subj][d.date]) {
         state.notes[d.subj][d.date].splice(d.idx,1);
         if (!state.notes[d.subj][d.date].length) delete state.notes[d.subj][d.date];
+        save(); renderNotes(d.subj);
+      }
+    }
+    const fold = e.target.closest('[data-note-fold]');
+    if (fold) {
+      const d = JSON.parse(fold.dataset.noteFold);
+      const note = state.notes[d.subj]?.[d.date]?.[d.idx];
+      if (note) {
+        note.collapsed = !note.collapsed;
         save(); renderNotes(d.subj);
       }
     }
