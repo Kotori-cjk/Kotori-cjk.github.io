@@ -178,10 +178,23 @@ function debounceSave() { clearTimeout(saveTimer); saveTimer = setTimeout(save, 
 let nextId = Date.now();
 function uid() { return ''+(nextId++); }
 
+function looksLikeMathBlock(content) {
+  return /\\[a-zA-Z]+|[_^{}=+\-*/]|[∫∑√πηΔ]/.test(content);
+}
+
+function normalizeLatexBlocks(text) {
+  return String(text).replace(/(^|\n)\s*\[\s*\n([\s\S]*?)\n\s*\]\s*(?=\n|$)/g, (match, prefix, body) => {
+    const content = body.trim();
+    if (!content || !looksLikeMathBlock(content)) return match;
+    return `${prefix}$$\n${content}\n$$`;
+  });
+}
+
 function renderMarkdown(text) {
   if (!text) return '';
   // Resolve idb: image references from cache
   text = text.replace(/\(idb:([^)]+)\)/g, (m, key) => '(' + (imageCache[key] || '#') + ')');
+  text = normalizeLatexBlocks(text);
   if (typeof marked !== 'undefined') { marked.setOptions({breaks:true,gfm:true}); return marked.parse(text); }
   return escHtml(text).replace(/\n/g,'<br>');
 }
