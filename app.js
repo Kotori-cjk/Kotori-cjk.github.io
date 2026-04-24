@@ -190,12 +190,35 @@ function normalizeLatexBlocks(text) {
   });
 }
 
+function protectDisplayMath(text) {
+  const blocks = [];
+  const protectedText = normalizeLatexBlocks(text).replace(/(^|\n)\s*\$\$\s*\n([\s\S]*?)\n\s*\$\$\s*(?=\n|$)/g, (match, prefix, body) => {
+    const token = `KOTORI_MATH_BLOCK_${blocks.length}`;
+    blocks.push({
+      token,
+      html: `<div class="math-block">$$\n${escHtml(body.trim())}\n$$</div>`
+    });
+    return `${prefix}${token}\n`;
+  });
+  return { text: protectedText, blocks };
+}
+
+function restoreDisplayMath(html, blocks) {
+  return blocks.reduce((out, block) => {
+    const wrapped = new RegExp(`<p>\\s*${block.token}\\s*</p>`, 'g');
+    return out.replace(wrapped, block.html).replaceAll(block.token, block.html);
+  }, html);
+}
+
 function renderMarkdown(text) {
   if (!text) return '';
   // Resolve idb: image references from cache
   text = text.replace(/\(idb:([^)]+)\)/g, (m, key) => '(' + (imageCache[key] || '#') + ')');
-  text = normalizeLatexBlocks(text);
-  if (typeof marked !== 'undefined') { marked.setOptions({breaks:true,gfm:true}); return marked.parse(text); }
+  const math = protectDisplayMath(text);
+  if (typeof marked !== 'undefined') {
+    marked.setOptions({breaks:true,gfm:true});
+    return restoreDisplayMath(marked.parse(math.text), math.blocks);
+  }
   return escHtml(text).replace(/\n/g,'<br>');
 }
 function renderLatex(root) {
