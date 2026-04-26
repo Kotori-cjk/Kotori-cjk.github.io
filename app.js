@@ -336,6 +336,7 @@ function renderNotes(subj) {
     <div class="note-preview" id="note-preview" style="display:none"></div>
     <div class="note-input-row">
       <button class="btn btn-primary btn-sm" id="note-submit-btn">发布笔记</button>
+      <button class="btn btn-secondary btn-sm hidden" id="note-cancel-edit-btn">取消编辑</button>
     </div>
   </div>`;
 
@@ -375,9 +376,12 @@ function renderNotes(subj) {
         <div class="note-card-head">
           <div>
             ${n.title ? `<div class="note-title-heading">${escHtml(n.title)}</div>` : ''}
-            <div class="note-time">${n.time}</div>
+            <div class="note-time">${n.time}${n.updatedAt ? ` · 更新于 ${n.updatedAt}` : ''}</div>
           </div>
-          <button class="note-fold" data-note-fold='${JSON.stringify({subj,date,idx:realIdx})}'>${n.collapsed ? '展开' : '折叠'}</button>
+          <div class="note-card-actions">
+            <button class="note-fold" data-note-edit='${JSON.stringify({subj,date,idx:realIdx})}'>编辑</button>
+            <button class="note-fold" data-note-fold='${JSON.stringify({subj,date,idx:realIdx})}'>${n.collapsed ? '展开' : '折叠'}</button>
+          </div>
         </div>
         <div class="note-body">${renderMarkdown(n.content)}</div>
         <button class="note-delete" data-note-del='${JSON.stringify({subj,date,idx:realIdx})}'>✕</button>
@@ -588,12 +592,39 @@ function setupEvents() {
       const content = ta.value.trim();
       if (!content && !title) return;
       const subj = state.currentView;
+      const editing = ta.dataset.editingNote ? JSON.parse(ta.dataset.editingNote) : null;
+      if (editing) {
+        const note = state.notes[editing.subj]?.[editing.date]?.[editing.idx];
+        if (note) {
+          note.title = title;
+          note.content = content;
+          note.updatedAt = now();
+          save(); renderNotes(editing.subj);
+        }
+        return;
+      }
       const d = today();
       if (!state.notes[subj][d]) state.notes[subj][d] = [];
       state.notes[subj][d].push({ id:uid(), title, content, time:now() });
       save(); renderNotes(subj);
       const ti = document.getElementById('note-title-input');
       if (ti) ti.focus();
+      return;
+    }
+    if (e.target.id === 'note-cancel-edit-btn') {
+      const titleInput = document.getElementById('note-title-input');
+      const ta = document.getElementById('note-textarea');
+      if (titleInput) titleInput.value = '';
+      if (ta) {
+        ta.value = '';
+        delete ta.dataset.editingNote;
+        ta.style.display = '';
+      }
+      const pv = document.getElementById('note-preview');
+      if (pv) { pv.style.display = 'none'; pv.innerHTML = ''; }
+      const submit = document.getElementById('note-submit-btn');
+      if (submit) submit.textContent = '发布笔记';
+      e.target.classList.add('hidden');
       return;
     }
     if (e.target.id === 'note-preview-btn') {
@@ -615,6 +646,29 @@ function setupEvents() {
         if (!state.notes[d.subj][d.date].length) delete state.notes[d.subj][d.date];
         save(); renderNotes(d.subj);
       }
+    }
+    const edit = e.target.closest('[data-note-edit]');
+    if (edit) {
+      const d = JSON.parse(edit.dataset.noteEdit);
+      const note = state.notes[d.subj]?.[d.date]?.[d.idx];
+      if (!note) return;
+      const titleInput = document.getElementById('note-title-input');
+      const ta = document.getElementById('note-textarea');
+      const pv = document.getElementById('note-preview');
+      if (titleInput) titleInput.value = note.title || '';
+      if (ta) {
+        ta.value = note.content || '';
+        ta.dataset.editingNote = JSON.stringify(d);
+        ta.style.display = '';
+      }
+      if (pv) { pv.style.display = 'none'; pv.innerHTML = ''; }
+      const submit = document.getElementById('note-submit-btn');
+      const cancel = document.getElementById('note-cancel-edit-btn');
+      if (submit) submit.textContent = '更新笔记';
+      if (cancel) cancel.classList.remove('hidden');
+      document.querySelector('.note-input-area')?.scrollIntoView({behavior:'smooth', block:'start'});
+      if (titleInput) titleInput.focus();
+      return;
     }
     const fold = e.target.closest('[data-note-fold]');
     if (fold) {

@@ -97,6 +97,7 @@ body { font-family:var(--font-body); color:var(--text); background:var(--bg); mi
 .note-card:hover { box-shadow:var(--shadow-hover); border-color:var(--primary-light); }
 .note-card-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; padding-right:24px; }
 .note-card.collapsed .note-body { display:none; }
+.note-card-actions { display:flex; align-items:center; gap:6px; flex-shrink:0; }
 .note-fold { flex-shrink:0; padding:4px 10px; border:1px dashed var(--border); border-radius:16px; background:var(--bg); color:var(--text-light); font-size:12px; cursor:pointer; transition:all .2s; }
 .note-fold:hover { border-color:var(--primary); color:var(--primary); }
 .note-time { font-size:11px; color:var(--text-light); margin-bottom:8px; }
