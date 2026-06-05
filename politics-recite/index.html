@@ -129,7 +129,7 @@
         <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center gap-4">
             <div class="flex items-center gap-3 min-w-0">
                 <div id="brand-icon" class="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center text-red-900 font-black shadow-inner shrink-0">习</div>
-                <h1 class="text-xl font-bold tracking-widest truncate">思政背诵 <span class="text-xs text-yellow-300 font-normal">史纲单科版</span></h1>
+                <h1 class="text-xl font-bold tracking-widest truncate">思政背诵 <span class="text-xs text-yellow-300 font-normal">史纲 · 思修</span></h1>
             </div>
             <div class="flex items-center gap-3 shrink-0">
                 <div id="subject-summary" class="text-xs text-red-200 opacity-90 hidden sm:block">中国近现代史纲要 · 51 题</div>
@@ -144,7 +144,8 @@
                 <span>章节目录</span>
                 <button onclick="toggleMobileSidebar()" class="md:hidden text-gray-400 text-lg">×</button>
             </div>
-            <div id="subject-list" class="hidden"></div>
+            <div class="section-label">科目切换</div>
+            <div id="subject-list" class="p-2 border-b border-gray-100"></div>
             <div id="chapter-list" class="flex-1 overflow-y-auto p-2"></div>
         </aside>
 
@@ -165,6 +166,7 @@
 
     <button onclick="toggleMobileSidebar()" class="md:hidden fixed bottom-6 right-6 w-12 h-12 bg-red-800 text-white rounded-full shadow-xl flex items-center justify-center z-50 text-xl hover:bg-red-700 transition active:scale-95">☰</button>
 
+    <script src="sixiang-data.js"></script>
     <script>
         window.onerror = function(msg, url, line) {
             console.error('错误:', msg, '行号:', line);
@@ -402,6 +404,7 @@
     }
   }
 };
+        SUBJECTS.sixiang = SIXIANG_SUBJECT;
         const subjectOrder = Object.keys(SUBJECTS);
         const modeClass = 'mode-btn px-3 py-1.5 rounded-md text-sm font-bold transition whitespace-nowrap';
         let currentSubjectId = subjectOrder[0];
@@ -672,6 +675,7 @@
         function renderContent() {
             const subject = SUBJECTS[currentSubjectId];
             document.getElementById('brand-icon').textContent = subject.icon;
+            document.getElementById('subject-summary').textContent = subject.fullName + ' · ' + countQuestions(currentSubjectId) + ' 题';
             const container = document.getElementById('app-content');
             let data = activeQuestions();
             if (cardIndex >= data.length) cardIndex = 0;
