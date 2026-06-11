@@ -11,6 +11,7 @@ Kotori's Colorful Seika 是我的个人学习主页，也是一个轻量的浏�
 - 外部工作流：支持跳转 Obsidian、NotebookLM、Bangumi 等常用页面。
 - Code Analysis：跳转到洛谷刷题与 AI 代码分析站，用于保存题目、代码、AI 诊断和问答记录。
 - 思政背诵：包含史纲与思修两个栏目，提供章节背诵、抽认卡、填空、无限刷题、模拟考试和分科错题复习。
+- AI 背诵：整理 AI 引论概念辨析、计算公式、建模模板和高频判断纠偏。
 - 个性化设置：支持自定义背景图、网易云音乐、JSON 数据导入导出。
 
 ## 相关子站
@@ -18,6 +19,7 @@ Kotori's Colorful Seika 是我的个人学习主页，也是一个轻量的浏�
 - Code Analysis：[https://kotori-cjk.github.io/luogu-ai-journey/](https://kotori-cjk.github.io/luogu-ai-journey/)
 - Luogu Journey：[https://kotori-cjk.github.io/luogu-journey/](https://kotori-cjk.github.io/luogu-journey/)
 - 思政背诵：[https://kotori-cjk.github.io/politics-recite/](https://kotori-cjk.github.io/politics-recite/)
+- AI 背诵：[https://kotori-cjk.github.io/ai-recite/](https://kotori-cjk.github.io/ai-recite/)
 
 ## 技术栈
 
