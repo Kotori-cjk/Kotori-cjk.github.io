@@ -501,20 +501,20 @@
 
         function renderFlashcardMode(container, data) {
             if (data.length === 0) return renderEmptyState(container, '暂无题目', '当前范围没有可展示的抽认卡。');
-            container.className = 'flex-1 flex flex-col items-center justify-center p-4 bg-gray-50';
+            container.className = 'flex-1 flex flex-col items-center justify-start md:justify-center overflow-y-auto p-4 md:p-8 pb-24 bg-gray-50';
             const item = data[cardIndex];
             const wrapper = document.createElement('div');
             wrapper.className = 'w-full max-w-2xl text-center';
             wrapper.innerHTML = '<div class="flex justify-between items-center mb-4 gap-3">' +
                     '<div class="text-xs text-gray-400 font-mono">CARD ' + (cardIndex + 1) + ' / ' + data.length + '</div>' + renderMistakeButton(item.id) +
                 '</div>' +
-                '<div class="perspective-1000 w-full h-80 cursor-pointer group select-none" onclick="this.querySelector(&quot;.card-inner&quot;).classList.toggle(&quot;rotate-y-180&quot;)">' +
+                '<div class="perspective-1000 w-full h-[70vh] max-h-[34rem] min-h-[28rem] cursor-pointer group select-none" onclick="this.querySelector(&quot;.card-inner&quot;).classList.toggle(&quot;rotate-y-180&quot;)">' +
                     '<div class="card-inner w-full h-full relative transition-transform duration-500 transform-style-3d shadow-xl rounded-2xl">' +
                         '<div class="absolute w-full h-full backface-hidden bg-white rounded-2xl p-8 flex flex-col justify-center items-center border-2 border-white">' +
                             '<h3 class="text-xl md:text-2xl font-bold text-gray-800">' + escapeHtml(item.q) + '</h3>' +
                             '<p class="text-red-400 text-xs mt-8 animate-pulse">点击翻转</p>' +
                         '</div>' +
-                        '<div class="absolute w-full h-full backface-hidden bg-red-50 rounded-2xl p-8 flex flex-col justify-center items-start text-left border-2 border-red-200 rotate-y-180 overflow-y-auto">' +
+                        '<div class="absolute w-full h-full backface-hidden bg-red-50 rounded-2xl p-6 md:p-8 pb-10 flex flex-col justify-start items-start text-left border-2 border-red-200 rotate-y-180 overflow-y-auto overscroll-contain">' +
                             '<div class="text-gray-800 text-base leading-relaxed w-full">' + answerHtml(item.a) + '</div>' +
                         '</div>' +
                     '</div>' +
