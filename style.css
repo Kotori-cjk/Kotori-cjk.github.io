@@ -109,6 +109,11 @@ body { font-family:var(--font-body); color:var(--text); background:var(--bg); mi
 .note-body .math-block, .note-preview .math-block { overflow-x:auto; overflow-y:hidden; margin:10px 0; padding:2px 0; }
 .note-body .katex-display, .note-preview .katex-display { overflow-x:auto; overflow-y:hidden; padding:4px 0; }
 .note-body .katex, .note-preview .katex { color:var(--text); font-size:1.04em; }
+.note-body .loose-latex, .note-preview .loose-latex { white-space:nowrap; }
+.note-body table, .note-preview table { width:100%; border-collapse:collapse; margin:12px 0; overflow:hidden; border-radius:10px; background:rgba(255,255,255,.52); }
+.note-body th, .note-preview th { color:var(--text); font-weight:700; background:rgba(255,107,157,.10); }
+.note-body th,.note-body td,.note-preview th,.note-preview td { border-bottom:1px solid rgba(255,107,157,.22); padding:8px 10px; vertical-align:top; }
+.note-body td, .note-preview td { word-break:break-word; }
 .note-body h1,.note-body h2,.note-body h3 { font-family:var(--font-cute); color:var(--primary-dark); margin:12px 0 6px; }
 .note-body blockquote { border-left:3px solid var(--primary-light); padding-left:12px; color:var(--text-light); margin:8px 0; }
 .note-body ul,.note-body ol { padding-left:20px; margin:8px 0; }

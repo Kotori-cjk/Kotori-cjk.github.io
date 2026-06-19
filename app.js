@@ -222,16 +222,110 @@ function renderMarkdown(text) {
   return escHtml(text).replace(/\n/g,'<br>');
 }
 function renderLatex(root) {
-  if (!root || typeof renderMathInElement === 'undefined') return;
-  renderMathInElement(root, {
-    delimiters: [
-      { left: '$$', right: '$$', display: true },
-      { left: '\\[', right: '\\]', display: true },
-      { left: '$', right: '$', display: false },
-      { left: '\\(', right: '\\)', display: false }
-    ],
-    ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-    throwOnError: false
+  if (!root) return;
+  if (typeof renderMathInElement !== 'undefined') {
+    renderMathInElement(root, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '\\[', right: '\\]', display: true },
+        { left: '$', right: '$', display: false },
+        { left: '\\(', right: '\\)', display: false }
+      ],
+      ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+      throwOnError: false
+    });
+  }
+  renderLooseLatex(root);
+}
+
+function looksLikeLooseLatex(s) {
+  const text = String(s || '').trim();
+  if (!text || /[\u4e00-\u9fff]/.test(text)) return false;
+  return /\\[a-zA-Z]+/.test(text) || /[A-Za-z]\s*_\s*\{[^}]+\}/.test(text) || /\^\s*\{[^}]+\}/.test(text);
+}
+
+function normalizeLooseLatexExpr(expr) {
+  let text = String(expr || '').trim();
+  while (text.endsWith(')')) {
+    const opens = (text.match(/\(/g) || []).length;
+    const closes = (text.match(/\)/g) || []).length;
+    if (closes <= opens) break;
+    text = text.slice(0, -1).trim();
+  }
+  return text;
+}
+
+function renderLatexFragment(expr) {
+  expr = normalizeLooseLatexExpr(expr);
+  if (typeof katex === 'undefined' || !looksLikeLooseLatex(expr)) return null;
+  try {
+    return katex.renderToString(expr, { throwOnError:false, displayMode:false });
+  } catch(e) {
+    return null;
+  }
+}
+
+function replaceLooseLatexInText(text) {
+  const source = String(text || '');
+  if (!/[\\_^]/.test(source)) return null;
+  const parts = [];
+  let cursor = 0;
+  const pushReplacement = (start, end, expr) => {
+    if (start < cursor) return false;
+    const html = renderLatexFragment(expr);
+    if (!html) return false;
+    if (start > cursor) parts.push(document.createTextNode(source.slice(cursor, start)));
+    const span = document.createElement('span');
+    span.className = 'loose-latex';
+    span.innerHTML = html;
+    parts.push(span);
+    cursor = end;
+    return true;
+  };
+
+  const patterns = [
+    /[（(]([^，。；！？\n|]{2,220})[）)]/g,
+    /\\[a-zA-Z]+[^\u4e00-\u9fff，。；！？\n|]{1,220}/g,
+    /[A-Za-z]\s*_\s*\{[^}]+\}(?:\s*[-+=]\s*[^\u4e00-\u9fff，。；！？\n|]+)?/g
+  ];
+
+  const matches = [];
+  patterns.forEach(re => {
+    let m;
+    while ((m = re.exec(source)) !== null) {
+      const raw = m[0];
+      const inner = m[1] || raw;
+      const expr = m[1] ? raw : inner;
+      if (looksLikeLooseLatex(inner)) matches.push({ start:m.index, end:m.index + raw.length, expr });
+    }
+  });
+  matches.sort((a,b) => a.start - b.start || b.end - a.end);
+  matches.forEach(m => pushReplacement(m.start, m.end, m.expr));
+  if (!parts.length) return null;
+  if (cursor < source.length) parts.push(document.createTextNode(source.slice(cursor)));
+  return parts;
+}
+
+function renderLooseLatex(root) {
+  if (typeof katex === 'undefined') return;
+  const ignored = new Set(['SCRIPT','NOSCRIPT','STYLE','TEXTAREA','PRE','CODE']);
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode(node) {
+      const parent = node.parentElement;
+      if (!parent || ignored.has(parent.tagName) || parent.closest('.katex, .katex-display')) {
+        return NodeFilter.FILTER_REJECT;
+      }
+      return /[\\_^]/.test(node.nodeValue || '') ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+    }
+  });
+  const nodes = [];
+  while (walker.nextNode()) nodes.push(walker.currentNode);
+  nodes.forEach(node => {
+    const replacements = replaceLooseLatexInText(node.nodeValue);
+    if (!replacements) return;
+    const frag = document.createDocumentFragment();
+    replacements.forEach(part => frag.appendChild(part));
+    node.parentNode.replaceChild(frag, node);
   });
 }
 function compressImage(file, maxW, q) {
