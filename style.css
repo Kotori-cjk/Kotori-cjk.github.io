@@ -17,6 +17,8 @@
     --radius: 18px; --radius-sm: 12px; --radius-xs: 8px;
     --font-cute: 'WanYuanTi','ZCOOL KuaiLe',cursive;
     --font-body: 'Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-serif;
+    --font-note: Consolas,'Noto Sans SC','Microsoft YaHei',-apple-system,BlinkMacSystemFont,sans-serif;
+    --font-note-heading: Consolas,'WanYuanTi','ZCOOL KuaiLe','Noto Sans SC',cursive;
     --sidebar-w: 260px; --header-h: 72px;
     /* subject colors */
     --c-math: #FF6B9D; --c-physics: #6C9FFF; --c-cs: #7DCEA0; --c-ai: #B4A0E5; --c-algo: #FFB86C;
@@ -101,9 +103,9 @@ body { font-family:var(--font-body); color:var(--text); background:var(--bg); mi
 .note-fold { flex-shrink:0; padding:4px 10px; border:1px dashed var(--border); border-radius:16px; background:var(--bg); color:var(--text-light); font-size:12px; cursor:pointer; transition:all .2s; }
 .note-fold:hover { border-color:var(--primary); color:var(--primary); }
 .note-time { font-size:11px; color:var(--text-light); margin-bottom:8px; }
-.note-body { font-size:14px; line-height:1.7; }
+.note-body { font-family:var(--font-note); font-size:14px; line-height:1.7; }
 .note-body img { max-width:100%; border-radius:var(--radius-xs); margin:8px 0; }
-.note-body code { background:#f0f0f5; padding:1px 5px; border-radius:4px; font-size:13px; }
+.note-body code, .note-preview code { font-family:Consolas,'Courier New',monospace; background:#f0f0f5; padding:1px 5px; border-radius:4px; font-size:13px; }
 .note-body pre { background:#f0f0f5; padding:12px; border-radius:var(--radius-xs); overflow-x:auto; margin:8px 0; }
 .note-body pre code { background:none; padding:0; }
 .note-body .math-block, .note-preview .math-block { overflow-x:auto; overflow-y:hidden; margin:10px 0; padding:2px 0; }
@@ -114,7 +116,8 @@ body { font-family:var(--font-body); color:var(--text); background:var(--bg); mi
 .note-body th, .note-preview th { color:var(--text); font-weight:700; background:rgba(255,107,157,.10); }
 .note-body th,.note-body td,.note-preview th,.note-preview td { border-bottom:1px solid rgba(255,107,157,.22); padding:8px 10px; vertical-align:top; }
 .note-body td, .note-preview td { word-break:break-word; }
-.note-body h1,.note-body h2,.note-body h3 { font-family:var(--font-cute); color:var(--primary-dark); margin:12px 0 6px; }
+.note-body h1,.note-body h2,.note-body h3,
+.note-preview h1,.note-preview h2,.note-preview h3 { font-family:var(--font-note-heading); color:var(--primary-dark); margin:12px 0 6px; }
 .note-body blockquote { border-left:3px solid var(--primary-light); padding-left:12px; color:var(--text-light); margin:8px 0; }
 .note-body ul,.note-body ol { padding-left:20px; margin:8px 0; }
 .note-body p { margin:6px 0; }
@@ -128,9 +131,9 @@ body { font-family:var(--font-body); color:var(--text); background:var(--bg); mi
 .note-tool-btn { display:inline-flex; align-items:center; gap:3px; padding:4px 10px; background:var(--bg); border:1px solid var(--border); border-radius:16px; font-size:12px; color:var(--text-light); cursor:pointer; transition:all .2s; font-family:var(--font-body); }
 .note-tool-btn:hover { border-color:var(--primary); color:var(--primary); }
 .note-tool-btn input[type="file"] { display:none; }
-.note-input-area textarea { width:100%; min-height:100px; padding:12px; border:2px solid var(--border); border-radius:var(--radius-xs); font-family:var(--font-body); font-size:13px; resize:vertical; background:#fff; color:var(--text); transition:border-color .2s; }
+.note-input-area textarea { width:100%; min-height:100px; padding:12px; border:2px solid var(--border); border-radius:var(--radius-xs); font-family:var(--font-note); font-size:13px; resize:vertical; background:#fff; color:var(--text); transition:border-color .2s; }
 .note-input-area textarea:focus { outline:none; border-color:var(--primary-light); box-shadow:0 0 0 3px rgba(255,107,157,.1); }
-.note-preview { padding:12px; background:#fff; border:2px solid var(--border); border-radius:var(--radius-xs); font-size:14px; line-height:1.7; min-height:80px; }
+.note-preview { font-family:var(--font-note); padding:12px; background:#fff; border:2px solid var(--border); border-radius:var(--radius-xs); font-size:14px; line-height:1.7; min-height:80px; }
 .note-preview img { max-width:100%; border-radius:var(--radius-xs); }
 .note-input-row { display:flex; gap:8px; margin-top:8px; }
 .note-input-row .btn { align-self:flex-end; }
