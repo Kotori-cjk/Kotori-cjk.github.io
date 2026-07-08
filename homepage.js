@@ -39,8 +39,8 @@ const HOMEPAGE_CONTENT = {
   links: {
     bangumi: 'https://bangumi.tv/user/1151382',
     github: 'https://github.com/Kotori-cjk',
-    x: '',
-    email: ''
+    x: 'https://x.com/KotoriMare',
+    email: '3259617604@qq.com'
   }
 };
 
