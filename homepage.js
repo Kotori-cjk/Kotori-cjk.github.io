@@ -1,26 +1,47 @@
-﻿const HOME_KEY = 'kotori-homepage-v1';
-const SEIKA_KEY = 'kotori-seika-v1';
+﻿const SEIKA_KEY = 'kotori-seika-v1';
 const AUTH_KEY = 'kotori-space-auth';
 const SPACE_PASSWORD = 'Favorite is my favorite!';
 const IDB_NAME = 'kotori-seika-images';
 const IDB_STORE = 'images';
 
-const defaultHome = {
-  profileMarkdown: `## こんにちは，Kotori です
-
-这里是我的个人入口。可以写番剧、游戏、音乐、角色、轻小说，也可以放一点日常碎碎念。
-
-> May every ordinary day have a little color.
-
-- 喜欢的作品：待补充
-- 最近在看：待补充
-- 最近在听：待补充`,
+/*
+  HOMEPAGE_CONTENT is the itemized modifier for the public homepage.
+  Edit the values below when you want to change the fixed website content.
+*/
+const HOMEPAGE_CONTENT = {
+  mark: 'ことり',
+  greeting: 'こんにちは、Kotoriです~',
+  quote: 'そして始まる、きみとはぐ、のセカイ!',
+  sections: [
+    {
+      title: 'ACGN works:',
+      items: [
+        { label: 'Anime', text: '小林家的龙女仆、冰菓、JoJo的奇妙冒险系列、刀剑神域、缘之空' },
+        { label: 'Cartoon', text: '点兔、碧蓝之海' },
+        { label: 'Game', text: 'FGO、さくら、もゆ、饥荒、anemoi' },
+        { label: 'Light Novel', text: '约会大作战、春物、樱花庄的宠物女孩、败犬女主、游戏人生、通往夏天的隧道，再见的出口' }
+      ]
+    },
+    {
+      title: 'Scientific and Fantasy Novels:',
+      items: [
+        { text: '沙丘、黑暗的左手、三体、侏罗纪公园、基地、微宇宙的上帝' },
+        { text: 'HP、克苏鲁神话系列、好兆头、指环王' }
+      ]
+    },
+    {
+      title: 'Current Interests:',
+      items: [
+        { text: '二十世纪电气目录、アストラエアの白き永遠' }
+      ]
+    }
+  ],
   links: {
     bangumi: 'https://bangumi.tv/user/1151382',
     github: 'https://github.com/Kotori-cjk',
     x: '',
     email: ''
-  },
+  }
 };
 
 const defaultSeika = {
@@ -31,7 +52,6 @@ const defaultSeika = {
   }
 };
 
-let homeState = structuredClone(defaultHome);
 let seikaState = structuredClone(defaultSeika);
 let idb = null;
 let imageCache = {};
@@ -89,30 +109,29 @@ function idbGetAll() {
 
 function loadState() {
   try {
-    const home = JSON.parse(localStorage.getItem(HOME_KEY) || 'null');
-    if (home) homeState = { ...defaultHome, ...home, links: { ...defaultHome.links, ...(home.links || {}) } };
-  } catch (_) {}
-  try {
     const seika = JSON.parse(localStorage.getItem(SEIKA_KEY) || 'null');
     if (seika) seikaState = { ...defaultSeika, ...seika, settings: { ...defaultSeika.settings, ...(seika.settings || {}) } };
   } catch (_) {}
-}
-function saveHome() {
-  localStorage.setItem(HOME_KEY, JSON.stringify(homeState));
 }
 function saveSeika() {
   localStorage.setItem(SEIKA_KEY, JSON.stringify(seikaState));
 }
 
-function renderMarkdown(text) {
-  if (typeof marked !== 'undefined') {
-    marked.setOptions({ breaks: true, gfm: true });
-    return marked.parse(String(text || ''));
-  }
-  return escHtml(text).replace(/\n/g, '<br>');
-}
 function renderProfile() {
-  document.getElementById('profile-rendered').innerHTML = renderMarkdown(homeState.profileMarkdown);
+  document.querySelector('.profile-mark').textContent = HOMEPAGE_CONTENT.mark;
+  const sections = HOMEPAGE_CONTENT.sections.map(section => {
+    const items = section.items.map(item => {
+      const label = item.label ? `<strong>${escHtml(item.label)}:</strong> ` : '';
+      return `<li>${label}${escHtml(item.text)}</li>`;
+    }).join('');
+    return `<section class="profile-section"><h2>${escHtml(section.title)}</h2><ul>${items}</ul></section>`;
+  }).join('');
+
+  document.getElementById('profile-rendered').innerHTML = `
+    <h2 class="profile-greeting">${escHtml(HOMEPAGE_CONTENT.greeting)}</h2>
+    <div class="profile-quote">${escHtml(HOMEPAGE_CONTENT.quote)}</div>
+    ${sections}
+  `;
 }
 function setLink(id, href, fallbackDisabled) {
   const el = document.getElementById(id);
@@ -127,10 +146,10 @@ function setLink(id, href, fallbackDisabled) {
   el.style.opacity = '';
 }
 function renderLinks() {
-  setLink('link-bangumi', normalizeUrl(homeState.links.bangumi), true);
-  setLink('link-github', normalizeUrl(homeState.links.github), true);
-  setLink('link-x', normalizeUrl(homeState.links.x), true);
-  const email = String(homeState.links.email || '').trim();
+  setLink('link-bangumi', normalizeUrl(HOMEPAGE_CONTENT.links.bangumi), true);
+  setLink('link-github', normalizeUrl(HOMEPAGE_CONTENT.links.github), true);
+  setLink('link-x', normalizeUrl(HOMEPAGE_CONTENT.links.x), true);
+  const email = String(HOMEPAGE_CONTENT.links.email || '').trim();
   setLink('link-email', email ? `mailto:${email}` : '', true);
 }
 
@@ -196,20 +215,6 @@ function renderMusicManageList() {
   ).join('');
 }
 
-async function hashPassword(password) {
-  const text = String(password || '');
-  if (window.crypto?.subtle) {
-    const data = new TextEncoder().encode(text);
-    const digest = await crypto.subtle.digest('SHA-256', data);
-    return 'sha256:' + Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
-  }
-  let h = 2166136261;
-  for (let i = 0; i < text.length; i++) {
-    h ^= text.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  return 'fnv:' + (h >>> 0).toString(16);
-}
 async function enterSpace() {
   const hint = document.getElementById('password-hint');
   const input = document.getElementById('space-password-input');
@@ -238,34 +243,15 @@ function closeModal(id) {
   modal.setAttribute('aria-hidden', 'true');
 }
 function openSettings() {
-  document.getElementById('profile-input').value = homeState.profileMarkdown || '';
-  document.getElementById('set-bangumi').value = homeState.links.bangumi || '';
-  document.getElementById('set-github').value = homeState.links.github || '';
-  document.getElementById('set-x').value = homeState.links.x || '';
-  document.getElementById('set-email').value = homeState.links.email || '';
   renderBgPreviews();
   renderMusicManageList();
   openModal('settings-modal');
 }
-async function closeSettings(saveChanges = true) {
-  if (saveChanges) {
-    homeState.profileMarkdown = document.getElementById('profile-input').value;
-    homeState.links.bangumi = document.getElementById('set-bangumi').value.trim();
-    homeState.links.github = document.getElementById('set-github').value.trim();
-    homeState.links.x = document.getElementById('set-x').value.trim();
-    homeState.links.email = document.getElementById('set-email').value.trim();
-    saveHome();
-    renderProfile();
-    renderLinks();
-  }
-  closeModal('settings-modal');
-}
 
 function setupEvents() {
   document.getElementById('settings-btn').addEventListener('click', openSettings);
-  document.getElementById('edit-profile-btn').addEventListener('click', openSettings);
-  document.querySelector('[data-close-settings]').addEventListener('click', () => closeSettings(true));
-  document.querySelector('#settings-modal .modal-overlay').addEventListener('click', () => closeSettings(true));
+  document.querySelector('[data-close-settings]').addEventListener('click', () => closeModal('settings-modal'));
+  document.querySelector('#settings-modal .modal-overlay').addEventListener('click', () => closeModal('settings-modal'));
 
   document.getElementById('enter-space-btn').addEventListener('click', () => {
     document.getElementById('space-password-input').value = '';
@@ -376,7 +362,3 @@ async function init() {
 }
 
 document.addEventListener('DOMContentLoaded', () => init());
-
-
-
-
