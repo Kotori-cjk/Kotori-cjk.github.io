@@ -1,6 +1,6 @@
 ﻿const SEIKA_KEY = 'kotori-seika-v1';
 const AUTH_KEY = 'kotori-space-auth';
-const SPACE_PASSWORD = 'Favorite is my favorite!';
+const SPACE_PASSWORD = 'Favorite';
 const IDB_NAME = 'kotori-seika-images';
 const IDB_STORE = 'images';
 
