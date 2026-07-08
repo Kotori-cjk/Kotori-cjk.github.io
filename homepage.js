@@ -219,6 +219,7 @@ async function enterSpace() {
   }
   if (input.value === SPACE_PASSWORD) {
     sessionStorage.setItem(AUTH_KEY, 'ok');
+    localStorage.setItem(AUTH_KEY, 'ok');
     window.location.href = 'space/';
     return;
   }
@@ -375,6 +376,7 @@ async function init() {
 }
 
 document.addEventListener('DOMContentLoaded', () => init());
+
 
 
 
