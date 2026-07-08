@@ -35,7 +35,7 @@ const HOMEPAGE_CONTENT = {
         { label: 'Pop', text: 'Ed Sheeran、Justin Bieber、Charlie Puth、Selena Gomez、YOASOBI、ヨルシカ' },
         { label: 'Acg', text: '霜月はるか、忍、三輪学、麻枝准、乐正绫' }
       ]
-    }
+    },
     {
       title: 'Current Interests:',
       items: [
@@ -379,5 +379,4 @@ async function init() {
 }
 
 document.addEventListener('DOMContentLoaded', () => init());
-
 
