@@ -17,18 +17,25 @@ const HOMEPAGE_CONTENT = {
       title: 'ACGN works:',
       items: [
         { label: 'Anime', text: '小林家的龙女仆、冰菓、JoJo的奇妙冒险系列、刀剑神域、缘之空' },
-        { label: 'Cartoon', text: '点兔、碧蓝之海' },
+        { label: 'Comic', text: '点兔、碧蓝之海' },
         { label: 'Game', text: 'FGO、さくら、もゆ、饥荒、anemoi' },
         { label: 'Light Novel', text: '约会大作战、春物、樱花庄的宠物女孩、败犬女主、游戏人生、通往夏天的隧道，再见的出口' }
       ]
     },
     {
-      title: 'Scientific and Fantasy Novels:',
+      title: 'Scientific and Fantasy Works:',
       items: [
-        { text: '沙丘、黑暗的左手、三体、侏罗纪公园、基地、微宇宙的上帝' },
-        { text: 'HP、克苏鲁神话系列、好兆头、指环王' }
+        { text: '沙丘、黑暗的左手、三体、基地、微宇宙的上帝、侏罗纪公园、异形、变形金刚' },
+        { text: 'HP、克苏鲁神话系列、好兆头、指环王、加勒比海盗' }
       ]
     },
+    {
+      title: "Musicians:",
+      items: [
+        { label: 'Pop',text:'Ed Sheeran、Justin Bieber、Charlie Puth、Selena Gomez、YOASOBI、ヨルシカ'},
+        { label: 'Acg',text:'霜月はるか、忍、三輪学、麻枝准、乐正绫'}
+      ]
+    }
     {
       title: 'Current Interests:',
       items: [
