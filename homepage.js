@@ -32,8 +32,8 @@ const HOMEPAGE_CONTENT = {
     {
       title: "Musicians:",
       items: [
-        { label: 'Pop',text:'Ed Sheeran、Justin Bieber、Charlie Puth、Selena Gomez、YOASOBI、ヨルシカ'},
-        { label: 'Acg',text:'霜月はるか、忍、三輪学、麻枝准、乐正绫'}
+        { label: 'Pop', text: 'Ed Sheeran、Justin Bieber、Charlie Puth、Selena Gomez、YOASOBI、ヨルシカ' },
+        { label: 'Acg', text: '霜月はるか、忍、三輪学、麻枝准、乐正绫' }
       ]
     }
     {
@@ -118,7 +118,7 @@ function loadState() {
   try {
     const seika = JSON.parse(localStorage.getItem(SEIKA_KEY) || 'null');
     if (seika) seikaState = { ...defaultSeika, ...seika, settings: { ...defaultSeika.settings, ...(seika.settings || {}) } };
-  } catch (_) {}
+  } catch (_) { }
 }
 function saveSeika() {
   localStorage.setItem(SEIKA_KEY, JSON.stringify(seikaState));
@@ -306,7 +306,7 @@ function setupEvents() {
     if (del) {
       const i = Number(del.dataset.bgDel);
       const key = seikaState.settings.backgrounds[i];
-      if (key && !key.startsWith('data:')) idbDel(key).catch(() => {});
+      if (key && !key.startsWith('data:')) idbDel(key).catch(() => { });
       delete imageCache[key];
       seikaState.settings.backgrounds.splice(i, 1);
       if (seikaState.settings.currentBg >= seikaState.settings.backgrounds.length) {
