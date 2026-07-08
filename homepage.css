@@ -55,10 +55,10 @@ body {
 }
 
 .home-shell {
-    width: min(1420px, calc(100vw - 44px));
+    width: min(1540px, calc(100vw - 36px));
     margin: 0 auto;
     padding: 24px 0 42px;
-    transform: translateX(-18px);
+    transform: translateX(-28px);
 }
 .topbar {
     min-height: 74px;
@@ -107,7 +107,7 @@ h1 {
 
 .hero-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1.95fr) 260px;
+    grid-template-columns: minmax(0, 1fr) 300px;
     gap: 18px;
     align-items: stretch;
     margin-top: 18px;
@@ -122,8 +122,11 @@ h1 {
     border-radius: 8px;
 }
 .profile-panel {
-    min-height: 520px;
-    padding: 30px 34px;
+    height: min(680px, calc(100vh - 150px));
+    min-height: 500px;
+    overflow-y: auto;
+    padding: 30px 36px 34px;
+    scrollbar-gutter: stable;
 }
 .profile-heading {
     display: flex;
@@ -204,6 +207,8 @@ h1 {
 }
 
 .gate-panel {
+    height: min(680px, calc(100vh - 150px));
+    min-height: 500px;
     padding: 18px;
     display: flex;
     flex-direction: column;
@@ -222,7 +227,7 @@ h1 {
     background: linear-gradient(90deg, var(--primary), var(--secondary), #ffd93d);
 }
 .gate-logo {
-    width: min(180px, 78%);
+    width: min(170px, 76%);
     aspect-ratio: 1;
     object-fit: contain;
     align-self: center;
@@ -472,6 +477,11 @@ h1 {
 }
 .music-manage-item button { width: 22px; height: 22px; }
 
+.profile-panel::-webkit-scrollbar { width: 7px; }
+.profile-panel::-webkit-scrollbar-track { background: rgba(255,255,255,.18); border-radius: 999px; }
+.profile-panel::-webkit-scrollbar-thumb { background: rgba(47,126,102,.42); border-radius: 999px; }
+.profile-panel::-webkit-scrollbar-thumb:hover { background: rgba(47,126,102,.62); }
+.profile-panel { scrollbar-width: thin; scrollbar-color: rgba(47,126,102,.48) rgba(255,255,255,.18); }
 body.bg-viewing .home-shell,
 body.bg-viewing #ambient-layer { opacity: 0; pointer-events: none; }
 body.bg-viewing #bg-layer.has-bg::after { background: transparent; }
@@ -496,6 +506,7 @@ body.bg-viewing .bg-view-exit { display: block; }
     .home-shell { width: min(100% - 22px, 720px); transform: none; padding-top: 18px; }
     .topbar { align-items: flex-start; }
     .hero-grid { grid-template-columns: 1fr; }
+    .profile-panel, .gate-panel { height: auto; max-height: none; }
     .gate-panel { min-height: 300px; }
     .gate-logo { width: 160px; margin-top: 8px; }
     .link-strip { flex-wrap: wrap; gap: 14px; }
@@ -504,3 +515,5 @@ body.bg-viewing .bg-view-exit { display: block; }
     .stretch-row { flex-wrap: wrap; }
     .stretch-row .text-input { min-width: 100%; }
 }
+
+

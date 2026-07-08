@@ -118,6 +118,7 @@ function saveSeika() {
 }
 
 function renderProfile() {
+  localStorage.removeItem('kotori-homepage-v1');
   document.querySelector('.profile-mark').textContent = HOMEPAGE_CONTENT.mark;
   const sections = HOMEPAGE_CONTENT.sections.map(section => {
     const items = section.items.map(item => {
@@ -362,3 +363,4 @@ async function init() {
 }
 
 document.addEventListener('DOMContentLoaded', () => init());
+
