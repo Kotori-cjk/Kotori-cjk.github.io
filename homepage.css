@@ -787,3 +787,99 @@ h1 {
     .link-strip { padding: 0; justify-content: center; }
     .music-container.record-grid { grid-template-columns: 1fr; }
 }
+
+/* 2026-07-08 fit2: no clipping, stable hero, centered links */
+.home-shell {
+    width: min(1500px, calc(100vw - 48px));
+    margin: 0 auto;
+    padding: 12px 0 44px;
+    transform: none;
+}
+.topbar {
+    min-height: 112px;
+    align-items: center;
+    overflow: visible;
+}
+.eyebrow {
+    margin-left: 0;
+}
+h1 {
+    font-size: clamp(44px, 4.7vw, 76px);
+    line-height: 1.02;
+    overflow: visible;
+}
+.hero-grid {
+    margin-top: 10px;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: 20px;
+    align-items: start;
+}
+.profile-panel,
+.gate-panel {
+    height: clamp(560px, calc(100vh - 172px), 760px);
+    min-height: 560px;
+}
+.profile-panel {
+    overflow-y: scroll;
+    padding: 24px 30px 72px;
+    scroll-padding-bottom: 72px;
+    border-bottom: 3px solid rgba(123,215,207,.9);
+}
+.profile-content::after {
+    content: '';
+    display: block;
+    height: 44px;
+}
+.profile-section:last-child {
+    margin-bottom: 28px;
+}
+.profile-greeting {
+    font-size: clamp(42px, 4.7vw, 74px);
+    white-space: normal;
+}
+.profile-section {
+    overflow: visible;
+}
+.profile-section li {
+    word-break: normal;
+    overflow-wrap: anywhere;
+}
+.gate-panel {
+    min-height: 560px;
+    padding: 18px 16px 24px;
+}
+.gate-logo {
+    width: min(160px, 76%);
+}
+.gate-panel h2 {
+    font-size: 23px;
+}
+.gate-panel .primary-btn {
+    width: 100%;
+    min-height: 54px;
+    white-space: normal;
+    line-height: 1.25;
+    padding: 10px 14px;
+}
+.link-strip {
+    width: min(760px, 100%);
+    margin: 26px auto 24px;
+    padding: 0;
+    justify-content: space-between;
+}
+.link-card {
+    width: 112px;
+    height: 112px;
+    flex: 0 0 112px;
+}
+.music-dock {
+    width: 100%;
+}
+@media (max-width: 940px) {
+    .home-shell { width: min(100% - 22px, 720px); padding-top: 12px; }
+    .topbar { min-height: 96px; }
+    .hero-grid { grid-template-columns: 1fr; }
+    .profile-panel { height: 68vh; min-height: 420px; }
+    .gate-panel { height: auto; min-height: 420px; }
+    .link-strip { width: min(520px, 100%); flex-wrap: wrap; justify-content: center; gap: 16px 28px; }
+}
