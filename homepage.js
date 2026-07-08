@@ -197,11 +197,20 @@ function renderMusic() {
   const container = document.getElementById('music-container');
   const ids = seikaState.settings.musicIds || [];
   if (!ids.length) {
+    container.classList.remove('record-grid');
     container.innerHTML = '<p class="empty-hint">还没有添加音乐。</p>';
     return;
   }
-  container.innerHTML = ids.map(id =>
-    `<iframe frameborder="no" width="100%" height="86" src="https://music.163.com/outchain/player?type=2&id=${escHtml(id)}&auto=0&height=66"></iframe>`
+  container.classList.add('record-grid');
+  container.innerHTML = ids.map((id, index) =>
+    `<div class="record-player">
+      <div class="record-disc" aria-hidden="true"></div>
+      <div class="record-arm" aria-hidden="true"></div>
+      <div class="record-embed">
+        <p class="record-label">Track ${index + 1}</p>
+        <iframe frameborder="no" width="100%" height="86" src="https://music.163.com/outchain/player?type=2&id=${escHtml(id)}&auto=0&height=66"></iframe>
+      </div>
+    </div>`
   ).join('');
 }
 function renderMusicManageList() {
@@ -363,4 +372,5 @@ async function init() {
 }
 
 document.addEventListener('DOMContentLoaded', () => init());
+
 

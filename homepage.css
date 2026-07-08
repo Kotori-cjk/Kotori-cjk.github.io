@@ -517,3 +517,142 @@ body.bg-viewing .bg-view-exit { display: block; }
 }
 
 
+
+/* 2026-07-08 polish pass: balanced columns, playful text, record-style music */
+.hero-grid {
+    grid-template-columns: minmax(0, 1fr) 270px;
+    gap: 18px;
+}
+.profile-panel,
+.gate-panel {
+    height: min(700px, calc(100vh - 138px));
+    min-height: 520px;
+}
+.profile-panel {
+    overflow-y: scroll;
+    border-image: linear-gradient(135deg, #f45c9b, #7bd7cf, #ffe06b, #8ba7ff) 1;
+}
+.profile-panel::-webkit-scrollbar { width: 10px; }
+.profile-panel::-webkit-scrollbar-track {
+    background: rgba(255,255,255,.26);
+    border-radius: 999px;
+    margin: 12px 0;
+}
+.profile-panel::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #f45c9b, #7bd7cf, #ffe06b);
+    border-radius: 999px;
+    border: 2px solid rgba(255,255,255,.55);
+}
+.profile-panel { scrollbar-width: thin; scrollbar-color: #7bd7cf rgba(255,255,255,.26); }
+.gate-panel {
+    justify-content: flex-start;
+    gap: 16px;
+    padding: 20px 18px;
+}
+.gate-logo {
+    width: min(178px, 82%);
+    margin: 12px auto 10px;
+}
+.gate-copy { margin-top: 0; }
+.gate-panel .primary-btn { margin-top: 12px; }
+.profile-quote {
+    color: #c99313;
+    font-weight: 700;
+    border: 2px solid transparent;
+    border-left: 6px solid #d6aa25;
+    background:
+        linear-gradient(rgba(255,255,255,.52), rgba(255,255,255,.52)) padding-box,
+        linear-gradient(120deg, #f45c9b, #7bd7cf, #ffe06b, #9ea8ff) border-box;
+    box-shadow: 0 14px 32px rgba(199, 147, 19, .1);
+}
+.profile-section {
+    padding: 18px 20px;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    background:
+        linear-gradient(rgba(255,255,255,.34), rgba(255,255,255,.34)) padding-box,
+        linear-gradient(120deg, rgba(244,92,155,.85), rgba(123,215,207,.85), rgba(255,224,107,.85), rgba(158,168,255,.85)) border-box;
+    box-shadow: 0 12px 30px rgba(49,62,58,.08);
+}
+.profile-section li {
+    font-family: var(--font-cute), 'Noto Sans SC', sans-serif;
+    font-size: 17px;
+    letter-spacing: .01em;
+}
+.profile-section strong { font-family: var(--font-subtitle); }
+.link-strip {
+    justify-content: space-between;
+    width: 100%;
+    gap: clamp(16px, 5vw, 52px);
+}
+.link-card { flex: 0 0 112px; }
+.music-dock { border-image: linear-gradient(90deg, #f45c9b, #7bd7cf, #ffe06b, #9ea8ff) 1; }
+.music-container.record-grid { grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); }
+.record-player {
+    position: relative;
+    min-height: 154px;
+    display: grid;
+    grid-template-columns: 118px minmax(0, 1fr);
+    align-items: center;
+    gap: 18px;
+    padding: 18px;
+    border-radius: 8px;
+    background:
+        linear-gradient(rgba(255,255,255,.42), rgba(255,255,255,.42)) padding-box,
+        linear-gradient(135deg, #f45c9b, #7bd7cf, #ffe06b) border-box;
+    border: 2px solid transparent;
+    box-shadow: 0 16px 38px rgba(49,62,58,.14);
+    overflow: hidden;
+}
+.record-disc {
+    width: 112px;
+    height: 112px;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at center, #f8f4e7 0 8px, #d95583 9px 18px, #191923 19px 42px, #2b2d3f 43px 48px, #11131d 49px 100%);
+    box-shadow: inset 0 0 0 8px rgba(255,255,255,.05), 0 12px 26px rgba(21,24,32,.24);
+    animation: recordSpin 6s linear infinite;
+}
+.record-arm {
+    position: absolute;
+    left: 94px;
+    top: 28px;
+    width: 74px;
+    height: 10px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #f2dfb8, #665d76);
+    transform: rotate(27deg);
+    transform-origin: left center;
+    box-shadow: 0 4px 12px rgba(40,34,52,.22);
+}
+.record-arm::after {
+    content: '';
+    position: absolute;
+    right: -5px;
+    top: -4px;
+    width: 14px;
+    height: 18px;
+    border-radius: 4px;
+    background: #443c55;
+}
+.record-embed { position: relative; z-index: 1; min-width: 0; }
+.record-label {
+    margin: 0 0 8px;
+    font-family: var(--font-subtitle);
+    color: var(--title-green);
+    font-weight: 700;
+}
+.record-embed iframe {
+    width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 8px 20px rgba(49,62,58,.1);
+}
+@keyframes recordSpin { to { transform: rotate(360deg); } }
+@media (max-width: 940px) {
+    .profile-panel,
+    .gate-panel { height: auto; min-height: 0; }
+    .profile-panel { max-height: 68vh; }
+    .link-strip { justify-content: center; }
+    .record-player { grid-template-columns: 1fr; justify-items: center; }
+    .record-arm { display: none; }
+}
