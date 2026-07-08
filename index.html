@@ -1,175 +1,135 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kotori's Colorful Seika</title>
+    <title>Kotori's Homepage</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="homepage.css">
 </head>
 <body>
     <div id="bg-layer"></div>
-    <div id="particles"></div>
+    <div id="ambient-layer" aria-hidden="true"></div>
 
-    <div id="app">
-        <header id="header">
-            <div class="header-left">
-                <h1 class="site-title">Kotori's Colorful Seika</h1>
-                <p class="subtitle">Learning is a colorful journey</p>
+    <main class="home-shell">
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">Kotori's personal gate</p>
+                <h1>Kotori's Homepage</h1>
             </div>
-            <div class="header-right">
-                <a href="https://bangumi.tv/user/1151382" class="header-btn" target="_blank" title="Bangumi">
-                    <span class="btn-icon">📺</span> Bangumi
-                </a>
-                <a href="https://kotori-cjk.github.io/luogu-ai-journey/" class="header-btn code-analysis-btn" target="_blank" title="Code Analysis">
-                    <span class="btn-icon">🔮</span> Code Analysis
-                </a>
-                <a id="obsidian-link" class="header-btn" title="Obsidian笔记">
-                    <span class="btn-icon">📒</span> Obsidian
-                </a>
-                <button id="settings-btn" class="header-btn" title="设置">
-                    <span class="btn-icon">⚙️</span> 设置
-                </button>
-                <button id="bg-view-btn" class="header-btn" title="观赏背景">
-                    <span class="btn-icon">🖼️</span> 观赏
-                </button>
+            <div class="top-actions">
+                <button id="bg-view-btn" class="icon-btn" title="观赏背景" aria-label="观赏背景">🖼</button>
+                <button id="settings-btn" class="icon-btn" title="设置" aria-label="设置">⚙</button>
             </div>
         </header>
 
-        <div class="main-layout">
-            <aside id="sidebar">
-                <div class="sidebar-section">
-                    <h3>📚 学科领域</h3>
-                    <div id="subject-nav" class="subject-nav">
-                        <div class="subject-group">
-                            <div class="subject-group-header">📐 数学</div>
-                            <button class="subject-btn sub active" data-subject="math-analysis"><span class="subj-icon">📊</span> 数分</button>
-                            <button class="subject-btn sub" data-subject="math-linalg"><span class="subj-icon">📏</span> 高代</button>
-                        </div>
-                        <div class="subject-group">
-                            <div class="subject-group-header">⚛️ 物理</div>
-                            <button class="subject-btn sub" data-subject="physics-mech"><span class="subj-icon">🔧</span> 力学</button>
-                            <button class="subject-btn sub" data-subject="physics-elec"><span class="subj-icon">⚡</span> 电学</button>
-                        </div>
-                        <button class="subject-btn" data-subject="cs"><span class="subj-icon">💻</span> 程设</button>
-                        <button class="subject-btn" data-subject="ai"><span class="subj-icon">🤖</span> AI引论</button>
-                        <a class="subject-btn subject-link" href="https://Kotori-cjk.github.io/luogu-journey/" target="_blank"><span class="subj-icon">🏆</span> 算法 ↗</a>
-                        <a class="subject-btn subject-link code-analysis-link" href="https://kotori-cjk.github.io/luogu-ai-journey/" target="_blank"><span class="subj-icon">🔮</span> Code Analysis ↗</a>
-                        <a class="subject-btn subject-link" href="politics-recite/"><span class="subj-icon">📕</span> 思政背诵 ↗</a>
-                        <a class="subject-btn subject-link" href="ai-recite/"><span class="subj-icon">🧠</span> AI背诵 ↗</a>
-                    </div>
+        <section class="hero-grid">
+            <div class="profile-panel">
+                <div class="profile-heading">
+                    <span class="profile-mark">ことり</span>
+                    <button id="edit-profile-btn" class="soft-btn">编辑</button>
                 </div>
+                <article id="profile-rendered" class="markdown-body"></article>
+            </div>
 
-                <div class="sidebar-section">
-                    <h3>📋 今日待办</h3>
-                    <div id="task-summary" class="task-summary">
-                        <span id="task-count">0 项待办</span>
-                    </div>
-                    <button class="subject-btn task-nav-btn" data-subject="tasks"><span class="subj-icon">✅</span> 任务面板</button>
-                </div>
-
-                <div class="sidebar-section music-section">
-                    <h3>🎵 音乐</h3>
-                    <div id="music-container">
-                        <p class="empty-hint">在设置中添加网易云音乐~</p>
-                    </div>
-                </div>
-                <div class="save-indicator" id="save-indicator">💾 就绪</div>
+            <aside class="gate-panel">
+                <div class="seal">Colorful Seika</div>
+                <h2>Kotori's Colorful Seika</h2>
+                <p>学习笔记、任务、学科整理和内部入口都在这里。</p>
+                <button id="enter-space-btn" class="primary-btn">进入主站</button>
+                <div id="locked-message" class="locked-message" hidden>请先输入密码。</div>
             </aside>
+        </section>
 
-            <main id="main-content">
-                <!-- Subject header with links -->
-                <div id="subject-header" class="subject-header"></div>
+        <section class="link-strip" aria-label="外部链接">
+            <a id="link-bangumi" class="link-card" target="_blank" rel="noreferrer">
+                <span>📺</span><strong>Bangumi</strong>
+            </a>
+            <a id="link-github" class="link-card" target="_blank" rel="noreferrer">
+                <span>⌘</span><strong>GitHub</strong>
+            </a>
+            <a id="link-x" class="link-card" target="_blank" rel="noreferrer">
+                <span>𝕏</span><strong>X</strong>
+            </a>
+            <a id="link-email" class="link-card">
+                <span>✉</span><strong>QQ Mail</strong>
+            </a>
+        </section>
 
-                <!-- Tab area: notes view -->
-                <div id="view-notes" class="view-content active"></div>
+        <section class="music-dock">
+            <div class="section-title">🎵 Music</div>
+            <div id="music-container" class="music-container"></div>
+        </section>
+    </main>
 
-                <!-- Task view (shown when "tasks" is selected) -->
-                <div id="view-tasks" class="view-content"></div>
-            </main>
+    <div id="password-modal" class="modal" aria-hidden="true">
+        <div class="modal-overlay"></div>
+        <div class="modal-content small-modal">
+            <div class="modal-header">
+                <h2>进入 Kotori's Colorful Seika</h2>
+                <button class="modal-close" data-close-password aria-label="关闭">×</button>
+            </div>
+            <div class="modal-body">
+                <input id="space-password-input" class="text-input" type="password" placeholder="Password" autocomplete="current-password">
+                <button id="password-submit-btn" class="primary-btn full">确认进入</button>
+                <p id="password-hint" class="form-hint"></p>
+            </div>
         </div>
     </div>
 
-    <!-- Settings Modal -->
-    <div id="settings-modal" class="modal">
+    <div id="settings-modal" class="modal" aria-hidden="true">
         <div class="modal-overlay"></div>
         <div class="modal-content">
             <div class="modal-header">
-                <h2>⚙️ 设置</h2>
-                <button class="modal-close">&times;</button>
+                <h2>Homepage 设置</h2>
+                <button class="modal-close" data-close-settings aria-label="关闭">×</button>
             </div>
-            <div class="modal-body">
-                <div class="settings-group">
-                    <h3>📒 Obsidian</h3>
-                    <label>Vault 名称</label>
-                    <input type="text" id="set-obsidian-vault" placeholder="Obsidian Vault">
-                    <label>📊 数分 笔记文件夹</label>
-                    <input type="text" id="set-obs-math-analysis" placeholder="例：数分">
-                    <label>📏 高代 笔记文件夹</label>
-                    <input type="text" id="set-obs-math-linalg" placeholder="例：高代">
-                    <label>🔧 力学 笔记文件夹</label>
-                    <input type="text" id="set-obs-physics-mech" placeholder="例：力学">
-                    <label>⚡ 电学 笔记文件夹</label>
-                    <input type="text" id="set-obs-physics-elec" placeholder="例：电学">
-                    <label>💻 程设 笔记文件夹</label>
-                    <input type="text" id="set-obs-cs" placeholder="例：程设">
-                    <label>🤖 AI引论 笔记文件夹</label>
-                    <input type="text" id="set-obs-ai" placeholder="例：AI引论">
-                </div>
-                <div class="settings-group">
-                    <h3>🔗 NotebookLM 链接</h3>
-                    <label>📊 数分</label>
-                    <input type="text" id="set-nlm-math-analysis" placeholder="NotebookLM URL">
-                    <label>📏 高代</label>
-                    <input type="text" id="set-nlm-math-linalg" placeholder="NotebookLM URL">
-                    <label>🔧 力学</label>
-                    <input type="text" id="set-nlm-physics-mech" placeholder="NotebookLM URL">
-                    <label>⚡ 电学</label>
-                    <input type="text" id="set-nlm-physics-elec" placeholder="NotebookLM URL">
-                    <label>💻 程设</label>
-                    <input type="text" id="set-nlm-cs" placeholder="NotebookLM URL">
-                    <label>🤖 AI引论</label>
-                    <input type="text" id="set-nlm-ai" placeholder="NotebookLM URL">
-                </div>
-                <div class="settings-group">
-                    <h3>🎨 背景图片</h3>
-                    <div class="bg-upload-area">
+            <div class="modal-body settings-layout">
+                <section class="settings-block wide">
+                    <h3>个人介绍</h3>
+                    <textarea id="profile-input" class="profile-input"></textarea>
+                </section>
+
+                <section class="settings-block">
+                    <h3>外部链接</h3>
+                    <label>Bangumi</label>
+                    <input id="set-bangumi" class="text-input" type="url">
+                    <label>GitHub</label>
+                    <input id="set-github" class="text-input" type="url">
+                    <label>X</label>
+                    <input id="set-x" class="text-input" type="url">
+                    <label>QQ 邮箱</label>
+                    <input id="set-email" class="text-input" type="email">
+                </section>
+
+                <section class="settings-block wide">
+                    <h3>背景图片</h3>
+                    <div class="inline-row">
                         <input type="file" id="bg-upload" accept="image/*" multiple hidden>
-                        <button class="btn btn-accent" onclick="document.getElementById('bg-upload').click()">📷 上传图片</button>
-                        <span class="upload-hint">支持多张切换</span>
+                        <button id="bg-upload-btn" class="soft-btn">上传图片</button>
+                        <button id="bg-reset-btn" class="soft-btn">默认背景</button>
                     </div>
                     <div id="bg-preview-list" class="bg-preview-list"></div>
-                    <button id="bg-reset-btn" class="btn btn-secondary">恢复默认背景</button>
-                </div>
-                <div class="settings-group">
-                    <h3>🎵 网易云音乐</h3>
-                    <div class="music-add-row">
-                        <input type="text" id="music-input" placeholder="粘贴歌曲链接或ID">
-                        <button id="music-add-btn" class="btn btn-primary">添加</button>
+                </section>
+
+                <section class="settings-block wide">
+                    <h3>网易云音乐</h3>
+                    <div class="inline-row stretch-row">
+                        <input id="music-input" class="text-input" type="text" placeholder="歌曲链接或 ID">
+                        <button id="music-add-btn" class="soft-btn">添加</button>
                     </div>
                     <div id="music-manage-list" class="music-manage-list"></div>
-                </div>
-                <div class="settings-group">
-                    <h3>💾 数据管理</h3>
-                    <div class="data-actions">
-                        <button id="export-btn" class="btn btn-secondary">📤 导出数据</button>
-                        <button class="btn btn-secondary" onclick="document.getElementById('import-file').click()">📥 导入数据</button>
-                        <input type="file" id="import-file" accept=".json" hidden>
-                    </div>
-                </div>
+                </section>
             </div>
         </div>
     </div>
 
-    <script src="seed.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+    <button class="bg-view-exit" id="bg-view-exit">退出观赏</button>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <button class="bg-view-exit" id="bg-view-exit">🖼️ 点击或按 Esc 退出观赏</button>
-    <div class="save-toast" id="save-toast"></div>
-    <script src="app.js"></script>
+    <script src="homepage.js"></script>
 </body>
 </html>
+
+

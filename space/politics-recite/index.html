@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>思政背诵 · 史纲</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&display=swap');
+        :root {
+            --primary-red: #991B1B;
+            --bg-cream: #FDFBF7;
+        }
+        body {
+            font-family: 'Noto Serif SC', serif;
+            background-color: var(--bg-cream);
+            overflow: hidden;
+        }
+        .kw-mask {
+            background-color: #991B1B;
+            color: transparent;
+            border-radius: 4px;
+            padding: 0 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 2px rgba(153, 27, 27, 0.2);
+            user-select: none;
+            margin: 0 2px;
+        }
+        .kw-mask:hover { transform: scale(1.05); background-color: #B91C1C; }
+        .kw-mask.revealed {
+            background-color: transparent;
+            color: #991B1B;
+            font-weight: bold;
+            border-bottom: 2px solid #EF4444;
+            box-shadow: none;
+        }
+        .chapter-btn, .subject-btn {
+            text-align: left;
+            width: 100%;
+            padding: 10px 12px;
+            font-size: 14px;
+            border-radius: 6px;
+            margin-bottom: 4px;
+            transition: all 0.2s;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+        }
+        .chapter-btn.active, .subject-btn.active {
+            background-color: #FEE2E2;
+            color: #991B1B;
+            font-weight: bold;
+            border-left: 4px solid #991B1B;
+        }
+        .chapter-btn:hover:not(.active), .subject-btn:hover:not(.active) { background-color: #F3F4F6; }
+        .subject-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            border: 1px solid transparent;
+        }
+        .subject-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #FEF3C7;
+            color: #7F1D1D;
+            font-weight: 900;
+            flex: 0 0 auto;
+        }
+        .section-label {
+            padding: 12px 12px 6px;
+            font-size: 11px;
+            letter-spacing: .08em;
+            color: #9CA3AF;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+        .perspective-1000 { perspective: 1000px; }
+        .transform-style-3d { transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+        .cloze-input {
+            border: none;
+            border-bottom: 2px solid #991B1B;
+            background: #FEF2F2;
+            color: #333;
+            padding: 0 4px;
+            margin: 0 2px;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .cloze-input:focus { outline: none; background: white; border-bottom-color: #EF4444; }
+        .cloze-input.correct { background-color: #DCFCE7; border-bottom-color: #22C55E; color: #15803D; }
+        .cloze-input.wrong { background-color: #FEE2E2; border-bottom-color: #EF4444; }
+        .mistake-toggle-btn { transition: all 0.2s; }
+        .mistake-toggle-btn.is-mistake {
+            background-color: #FEF2F2;
+            color: #DC2626;
+            border-color: #DC2626;
+        }
+        .mistake-toggle-btn.is-mistake:hover { background-color: #FEE2E2; }
+        .fade-enter { animation: fadeIn 0.25s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .range-option input { accent-color: #991B1B; }
+        .mode-btn { min-height: 36px; }
+        @media (max-width: 767px) {
+            .mode-btn { flex: 0 0 auto; }
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col text-gray-800">
+    <header class="bg-gradient-to-r from-red-900 to-red-800 text-white shadow-lg z-50 shrink-0">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center gap-4">
+            <div class="flex items-center gap-3 min-w-0">
+                <div id="brand-icon" class="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center text-red-900 font-black shadow-inner shrink-0">习</div>
+                <h1 class="text-xl font-bold tracking-widest truncate">思政背诵 <span class="text-xs text-yellow-300 font-normal">史纲 · 思修</span></h1>
+            </div>
+            <div class="flex items-center gap-3 shrink-0">
+                <div id="subject-summary" class="text-xs text-red-200 opacity-90 hidden sm:block">中国近现代史纲要 · 51 题</div>
+                <a href="../" class="text-xs font-bold bg-white/10 hover:bg-white/20 border border-white/20 rounded-md px-3 py-2 transition whitespace-nowrap">返回主站</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden relative">
+        <aside id="main-sidebar" class="w-72 bg-white border-r border-gray-200 flex flex-col hidden md:flex shrink-0 z-40 shadow-2xl md:shadow-sm transition-transform duration-300">
+            <div class="p-4 bg-gray-50 border-b text-xs font-bold text-gray-500 uppercase flex justify-between items-center">
+                <span>章节目录</span>
+                <button onclick="toggleMobileSidebar()" class="md:hidden text-gray-400 text-lg">×</button>
+            </div>
+            <div class="section-label">科目切换</div>
+            <div id="subject-list" class="p-2 border-b border-gray-100"></div>
+            <div id="chapter-list" class="flex-1 overflow-y-auto p-2"></div>
+        </aside>
+
+        <main class="flex-1 flex flex-col relative bg-[#fdfbf7] min-w-0">
+            <div class="flex flex-col md:flex-row justify-between items-center p-4 bg-white/95 backdrop-blur border-b sticky top-0 z-30 shrink-0 gap-3">
+                <h2 id="current-title" class="font-bold text-gray-800 truncate text-lg w-full md:w-auto">加载中...</h2>
+                <div class="flex bg-gray-100 p-1 rounded-lg shrink-0 overflow-x-auto max-w-full w-full md:w-auto">
+                    <button onclick="switchMode('mask')" class="mode-btn px-3 py-1.5 rounded-md text-sm font-bold transition whitespace-nowrap bg-white text-red-800 shadow-sm" id="btn-mask">🙈 遮挡背诵</button>
+                    <button onclick="switchMode('flashcard')" class="mode-btn px-3 py-1.5 rounded-md text-sm font-bold transition whitespace-nowrap text-gray-600 hover:text-red-700" id="btn-flashcard">🎴 抽认卡</button>
+                    <button onclick="switchMode('cloze')" class="mode-btn px-3 py-1.5 rounded-md text-sm font-bold transition whitespace-nowrap text-gray-600 hover:text-red-700" id="btn-cloze">✍️ 填空挑战</button>
+                    <button onclick="switchMode('practice')" class="mode-btn px-3 py-1.5 rounded-md text-sm font-bold transition whitespace-nowrap text-gray-600 hover:text-red-700" id="btn-practice">♾️ 无限刷题</button>
+                    <button onclick="switchMode('exam')" class="mode-btn px-3 py-1.5 rounded-md text-sm font-bold transition whitespace-nowrap text-gray-600 hover:text-red-700" id="btn-exam">📝 模拟考试</button>
+                </div>
+            </div>
+            <div id="app-content" class="flex-1 overflow-y-auto p-4 md:p-8 pb-24"></div>
+        </main>
+    </div>
+
+    <button onclick="toggleMobileSidebar()" class="md:hidden fixed bottom-6 right-6 w-12 h-12 bg-red-800 text-white rounded-full shadow-xl flex items-center justify-center z-50 text-xl hover:bg-red-700 transition active:scale-95">☰</button>
+
+    <script src="sixiang-data.js"></script>
+    <script>
+        window.onerror = function(msg, url, line) {
+            console.error('错误:', msg, '行号:', line);
+        };
+
+        const SUBJECTS = {
+  "shigang": {
+    "id": "shigang",
+    "name": "史纲",
+    "icon": "史",
+    "fullName": "中国近现代史纲要",
+    "chapters": {
+      "第一章：进入近代后中华民族的磨难与抗争": [
+        {
+          "q": "中国封建社会的主要矛盾和经济特征？",
+          "a": "<b>矛盾：</b>地主阶级和<span class='kw'>农民阶级</span>的矛盾。<br><b>经济：</b>以个体家庭为单位与家庭手工业结合的<span class='kw'>小农经济</span>（自给自足）。"
+        },
+        {
+          "q": "中国近代史的起点及社会性质的变化？",
+          "a": "<b>起点：</b><span class='kw'>鸦片战争</span>（1840年）。<br><b>性质：</b>由封建社会逐渐变为<span class='kw'>半殖民地半封建</span>社会。"
+        },
+        {
+          "q": "近代中国社会的主要矛盾？",
+          "a": "<span class='kw'>帝国主义和中华民族</span>的矛盾（最主要）、封建主义和人民大众的矛盾。"
+        },
+        {
+          "q": "近代以来中华民族面临的两大历史任务？",
+          "a": "1. 争取<span class='kw'>民族独立、人民解放</span>（前提）。<br>2. 实现<span class='kw'>国家富强、人民幸福</span>（目的）。"
+        },
+        {
+          "q": "列强未能实现瓜分中国图谋的原因？",
+          "a": "1. 帝国主义列强之间的<span class='kw'>矛盾和互相制约</span>（重要原因）。<br>2. 中华民族<span class='kw'>不屈不挠的反侵略斗争</span>（根本原因）。"
+        },
+        {
+          "q": "近代民族意识的觉醒代表？",
+          "a": "1. 林则徐：近代中国睁眼看世界的第一人，提出“<span class='kw'>师夷长技以制夷</span>”。<br>2. 严复：翻译《天演论》，喊出“<span class='kw'>救亡</span>”口号。<br>3. 孙中山：创立兴中会，喊出“<span class='kw'>振兴中华</span>”口号。"
+        }
+      ],
+      "第二章：不同社会力量对国家出路的早期探索": [
+        {
+          "q": "太平天国颁布的两个纲领性文件？",
+          "a": "1. <b>《天朝田亩制度》</b>：以解决<span class='kw'>土地问题</span>为中心，体现了绝对平均主义思想。<br>2. <b>《资政新篇》</b>：中国近代第一个比较系统的发展<span class='kw'>资本主义</span>的方案。"
+        },
+        {
+          "q": "洋务运动的指导思想和目标？",
+          "a": "<b>思想：</b><span class='kw'>中学为体，西学为用</span>。<br><b>目标：</b><span class='kw'>自强</span>（前期）、<span class='kw'>求富</span>（后期）。"
+        },
+        {
+          "q": "洋务运动的历史作用？",
+          "a": "1. 促进了<span class='kw'>中国早期工业</span>和民族资本主义的发展。<br>2. 开创了中国近代教育（新式学堂、留学生）。<br>3. 带来了新知识和资本主义观念。"
+        },
+        {
+          "q": "戊戌维新运动的性质和意义？",
+          "a": "<b>性质：</b><span class='kw'>资产阶级性质</span>的改良运动。<br><b>意义：</b>是一场爱国救亡运动，是一场<span class='kw'>思想启蒙</span>运动（最重大意义）。"
+        }
+      ],
+      "第三章：辛亥革命与君主专制制度的终结": [
+        {
+          "q": "孙中山的三民主义学说？",
+          "a": "1. <b>民族主义：</b>驱除鞑虏，恢复中华（反清）。<br>2. <b>民权主义：</b>创立民国（核心/建立<span class='kw'>资产阶级共和国</span>）。<br>3. <b>民生主义：</b>平均地权。"
+        },
+        {
+          "q": "革命派与改良派论战的焦点？",
+          "a": "要不要以<span class='kw'>革命手段</span>推翻清王朝。"
+        },
+        {
+          "q": "辛亥革命的历史意义？",
+          "a": "1. 推翻了清王朝统治，结束了统治中国两千多年的<span class='kw'>封建君主专制</span>制度（最大功绩）。<br>2. 建立了中国历史上第一个<span class='kw'>资产阶级共和</span>政府。<br>3. 推动了<span class='kw'>思想解放</span>和许多社会变革。"
+        },
+        {
+          "q": "辛亥革命失败的原因？",
+          "a": "<b>根本原因：</b>资本主义道路在中国行不通。<br><b>主观原因：</b>资产阶级革命派的<span class='kw'>软弱性和妥协性</span>（没提出彻底反帝反封建纲领、没发动群众、没建立坚强政党）。"
+        }
+      ],
+      "第四章：中国共产党和中国革命新局面": [
+        {
+          "q": "新文化运动的基本口号和主要阵地？",
+          "a": "<b>口号：</b><span class='kw'>民主</span>和<span class='kw'>科学</span>（德先生和塞先生）。<br><b>阵地：</b>《新青年》杂志和北京大学。"
+        },
+        {
+          "q": "五四运动的历史特点和意义？",
+          "a": "1. 是一次彻底的<span class='kw'>反帝反封建</span>的爱国革命运动。<br>2. 是<span class='kw'>新民主主义革命</span>的开端。<br>3. 促进了马克思主义在中国的传播。"
+        },
+        {
+          "q": "中国共产党成立的历史意义？",
+          "a": "是中华民族发展史上一个<span class='kw'>开天辟地</span>的大事变。从此，中国人民踏上了争取民族独立、人民解放的光明道路。"
+        },
+        {
+          "q": "第一次国共合作的政治基础？",
+          "a": "<span class='kw'>新三民主义</span>（联俄、联共、扶助农工三大政策）。"
+        },
+        {
+          "q": "大革命失败的经验教训？",
+          "a": "1. 必须坚持无产阶级的<span class='kw'>领导权</span>（关键）。<br>2. 必须坚持<span class='kw'>武装斗争</span>。<br>3. 必须加强党的<span class='kw'>自身建设</span>。"
+        }
+      ],
+      "第五章：中国革命的新道路": [
+        {
+          "q": "八七会议的主要内容？",
+          "a": "确定了<span class='kw'>土地革命</span>和<span class='kw'>武装起义</span>的方针。是由大革命失败到土地革命战争兴起的历史性转变。"
+        },
+        {
+          "q": "中国革命的新道路是什么？",
+          "a": "<span class='kw'>农村包围城市</span>、<span class='kw'>武装夺取政权</span>。"
+        },
+        {
+          "q": "古田会议确立的人民军队建设原则？",
+          "a": "确立了<span class='kw'>党对军队的绝对领导</span>（军魂）。"
+        },
+        {
+          "q": "遵义会议的历史意义？",
+          "a": "1. 挽救了党、红军和中国革命。<br>2. 是党的历史上一个<span class='kw'>生死攸关的转折点</span>。<br>3. 标志着中国共产党在政治上开始走向成熟。"
+        },
+        {
+          "q": "长征胜利的意义？",
+          "a": "1. 是中国革命<span class='kw'>转危为安</span>的关键。<br>2. 铸就了伟大的<span class='kw'>长征精神</span>。"
+        }
+      ],
+      "第六章：中华民族的抗日战争": [
+        {
+          "q": "抗日战争中中国共产党的地位？",
+          "a": "中国共产党是抗日战争的<span class='kw'>中流砥柱</span>。"
+        },
+        {
+          "q": "《论持久战》提出的战略总方针？",
+          "a": "实行<span class='kw'>持久战</span>，战争将经过战略防御、战略相持、战略反攻三个阶段。"
+        },
+        {
+          "q": "抗日战争中游击战争的战略地位？",
+          "a": "具有<span class='kw'>全局性</span>意义。在战略相持阶段，敌后游击战争成为主要的抗日作战方式。"
+        },
+        {
+          "q": "抗日民族统一战线的策略总方针？",
+          "a": "发展<span class='kw'>进步势力</span>，争取<span class='kw'>中间势力</span>，孤立<span class='kw'>顽固势力</span>。"
+        },
+        {
+          "q": "抗日战争胜利的决定性因素？",
+          "a": "以<span class='kw'>爱国主义</span>为核心的民族精神。<br>（注：全民族抗战是重要法宝）。"
+        },
+        {
+          "q": "抗日战争胜利的历史意义？",
+          "a": "1. 彻底粉碎了日本军国主义殖民奴役中国的图谋。<br>2. 是中华民族走向<span class='kw'>伟大复兴</span>的历史转折点。<br>3. 对世界反法西斯战争胜利作出了巨大贡献。"
+        }
+      ],
+      "第七章：为建立新中国而奋斗": [
+        {
+          "q": "《中国土地法大纲》的主要内容？",
+          "a": "是一个<span class='kw'>彻底反封建</span>的土地革命纲领，实行“耕者有其田”的土地制度。"
+        },
+        {
+          "q": "人民解放战争中的“第二条战线”？",
+          "a": "以<span class='kw'>学生运动</span>为主导的人民民主运动。"
+        },
+        {
+          "q": "中国共产党领导的多党合作和政治协商制度的地位？",
+          "a": "符合中国历史发展规律和中国人民的<span class='kw'>根本利益</span>，符合民主党派和无党派人士的意愿。"
+        },
+        {
+          "q": "中国革命胜利的基本经验（三大法宝）？",
+          "a": "<span class='kw'>统一战线</span>、<span class='kw'>武装斗争</span>、<span class='kw'>党的建设</span>。"
+        },
+        {
+          "q": "革命的根本问题是什么？",
+          "a": "<span class='kw'>国家政权</span>问题。"
+        }
+      ],
+      "第八章：中华人民共和国的成立与中国社会主义建设道路的探索": [
+        {
+          "q": "新中国成立的历史意义？",
+          "a": "1. 彻底结束了<span class='kw'>半殖民地半封建</span>社会的历史。<br>2. 实现了中国从几千年封建专制政治向<span class='kw'>人民民主</span>的伟大飞跃。<br>3. 中国人民成为国家、社会和自己命运的<span class='kw'>主人</span>。"
+        },
+        {
+          "q": "过渡时期总路线的内容（一化三改）？",
+          "a": "逐步实现国家的<span class='kw'>社会主义工业化</span>，并逐步实现国家对农业、手工业和资本主义工商业的<span class='kw'>社会主义改造</span>。"
+        },
+        {
+          "q": "社会主义基本制度确立的标志？",
+          "a": "社会主义改造基本完成，<span class='kw'>生产资料公有制</span>占绝对优势。"
+        },
+        {
+          "q": "《论十大关系》的基本方针？",
+          "a": "调动一切<span class='kw'>积极因素</span>为社会主义事业服务。"
+        },
+        {
+          "q": "中共八大对国内主要矛盾的判断？",
+          "a": "人民对于经济文化迅速发展的<span class='kw'>需要</span>同当前经济文化不能满足人民需要的状况之间的矛盾。"
+        },
+        {
+          "q": "关于正确处理人民内部矛盾的方针？",
+          "a": "用<span class='kw'>民主</span>的方法解决人民内部矛盾。"
+        }
+      ],
+      "第九章：改革开放与中国特色社会主义的开创和发展": [
+        {
+          "q": "真理标准问题大讨论的意义？",
+          "a": "是改革开放的<span class='kw'>思想先导</span>，是一场深刻而广泛的马克思主义思想解放运动。"
+        },
+        {
+          "q": "十一届三中全会的历史转折意义？",
+          "a": "重新确立了马克思主义的思想、政治、组织路线，开启了<span class='kw'>改革开放</span>和社会主义现代化建设新时期。"
+        },
+        {
+          "q": "农村改革的突破口？",
+          "a": "实行<span class='kw'>家庭联产承包责任制</span>（包产到户、包干到户）。"
+        },
+        {
+          "q": "中共十二大的重大命题？",
+          "a": "建设有<span class='kw'>中国特色</span>的社会主义。"
+        },
+        {
+          "q": "中共十三大提出的基本路线？",
+          "a": "一个中心（经济建设），两个基本点（<span class='kw'>四项基本原则</span>、<span class='kw'>改革开放</span>）。"
+        },
+        {
+          "q": "邓小平南方谈话阐述的社会主义本质？",
+          "a": "<span class='kw'>解放生产力</span>，发展生产力，消灭剥削，消除两极分化，最终达到<span class='kw'>共同富裕</span>。"
+        },
+        {
+          "q": "中共十四大确立的经济体制改革目标？",
+          "a": "建立<span class='kw'>社会主义市场经济</span>体制。"
+        },
+        {
+          "q": "中共十五大确立的指导思想？",
+          "a": "<span class='kw'>邓小平理论</span>。"
+        },
+        {
+          "q": "“三个代表”重要思想的内容？",
+          "a": "代表中国<span class='kw'>先进生产力</span>的发展要求，代表中国<span class='kw'>先进文化</span>的前进方向，代表中国<span class='kw'>最广大人民</span>的根本利益。"
+        },
+        {
+          "q": "科学发展观的核心和基本要求？",
+          "a": "核心是<span class='kw'>以人为本</span>，基本要求是全面协调可持续。"
+        }
+      ]
+    }
+  }
+};
+        SUBJECTS.sixiang = SIXIANG_SUBJECT;
+        const subjectOrder = Object.keys(SUBJECTS);
+        const modeClass = 'mode-btn px-3 py-1.5 rounded-md text-sm font-bold transition whitespace-nowrap';
+        let currentSubjectId = subjectOrder[0];
+        let currentChapterKey = firstChapterKey(currentSubjectId);
+        let currentMode = 'mask';
+        let cardIndex = 0;
+        let mistakeSets = {};
+        let practiceState = blankPracticeState();
+        let examState = blankExamState();
+
+        function firstChapterKey(subjectId) {
+            return Object.keys(SUBJECTS[subjectId].chapters)[0];
+        }
+
+        function blankPracticeState() {
+            return { status: 'setup', subjectId: null, scope: 'current', questions: [], currentIndex: 0, showAnswer: false, answeredCount: 0, round: 1 };
+        }
+
+        function blankExamState() {
+            return { status: 'setup', subjectId: null, selectedChapters: [], questionCount: 10, questions: [], currentIndex: 0, showAnswer: false, score: 0 };
+        }
+
+        function resetRuns() {
+            practiceState = blankPracticeState();
+            examState = blankExamState();
+        }
+
+        function storageKey(subjectId) {
+            return 'red_engine_mistakes_' + subjectId;
+        }
+
+        function loadMistakes() {
+            subjectOrder.forEach(function(subjectId) {
+                const saved = localStorage.getItem(storageKey(subjectId));
+                mistakeSets[subjectId] = new Set(saved ? JSON.parse(saved) : []);
+            });
+            migrateLegacyXigaiMistakes();
+        }
+
+        function migrateLegacyXigaiMistakes() {
+            const legacy = localStorage.getItem('xigai_mistakes');
+            if (!SUBJECTS.xigai || !legacy || !mistakeSets.xigai || mistakeSets.xigai.size > 0) return;
+            try {
+                const legacyQuestions = new Set(JSON.parse(legacy));
+                Object.keys(SUBJECTS.xigai.chapters).forEach(function(chapterKey) {
+                    SUBJECTS.xigai.chapters[chapterKey].forEach(function(item) {
+                        if (legacyQuestions.has(item.q)) mistakeSets.xigai.add(questionId('xigai', chapterKey, item));
+                    });
+                });
+                saveMistakes('xigai');
+            } catch (err) {
+                console.warn('旧错题本迁移失败:', err);
+            }
+        }
+
+        function saveMistakes(subjectId) {
+            localStorage.setItem(storageKey(subjectId), JSON.stringify(Array.from(mistakeSets[subjectId] || [])));
+        }
+
+        function getMistakeSet(subjectId) {
+            if (!mistakeSets[subjectId]) mistakeSets[subjectId] = new Set();
+            return mistakeSets[subjectId];
+        }
+
+        function questionId(subjectId, chapterKey, item) {
+            return subjectId + '::' + chapterKey + '::' + item.q;
+        }
+
+        function enrichQuestion(subjectId, chapterKey, item, index) {
+            return { id: questionId(subjectId, chapterKey, item), subjectId: subjectId, chapterKey: chapterKey, chapterName: chapterKey, q: item.q, a: item.a, index: index };
+        }
+
+        function questionsForChapters(subjectId, chapters) {
+            let list = [];
+            chapters.forEach(function(chapterKey) {
+                const raw = SUBJECTS[subjectId].chapters[chapterKey] || [];
+                raw.forEach(function(item, index) {
+                    list.push(enrichQuestion(subjectId, chapterKey, item, index));
+                });
+            });
+            return list;
+        }
+
+        function allQuestions(subjectId) {
+            return questionsForChapters(subjectId, Object.keys(SUBJECTS[subjectId].chapters));
+        }
+
+        function mistakeQuestions(subjectId) {
+            const set = getMistakeSet(subjectId);
+            return allQuestions(subjectId).filter(function(item) { return set.has(item.id); });
+        }
+
+        function activeQuestions() {
+            if (currentChapterKey === 'mistake_review') return mistakeQuestions(currentSubjectId);
+            return questionsForChapters(currentSubjectId, [currentChapterKey]);
+        }
+
+        function countQuestions(subjectId) {
+            return allQuestions(subjectId).length;
+        }
+
+        function escapeHtml(value) {
+            return String(value).replace(/[&<>"']/g, function(ch) {
+                return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch];
+            });
+        }
+
+        function jsArg(value) {
+            return escapeHtml(JSON.stringify(value));
+        }
+
+        function normalizeBreaks(html) {
+            return String(html).replace(/\\n/g, '<br>').replace(/\n/g, '<br>');
+        }
+
+        function answerHtml(raw) {
+            return normalizeBreaks(raw).replace(/<span class='kw'>/g, "<span class='font-bold text-red-700 bg-red-50 px-1 rounded'>");
+        }
+
+        function maskAnswerHtml(raw) {
+            return normalizeBreaks(raw).replace(/<span class='kw'>/g, "<span class='kw-mask' onclick='this.classList.toggle(\"revealed\")'>");
+        }
+
+        function isMistake(qid) {
+            const subjectId = qid.split('::')[0];
+            return getMistakeSet(subjectId).has(qid);
+        }
+
+        function renderMistakeButton(qid) {
+            const active = isMistake(qid);
+            const cls = active
+                ? 'mistake-toggle-btn is-mistake border px-3 py-1 rounded text-xs font-bold flex items-center gap-1 bg-red-50 text-red-600 border-red-500 hover:bg-red-100'
+                : 'mistake-toggle-btn border px-3 py-1 rounded text-xs font-bold flex items-center gap-1 bg-white text-gray-500 border-gray-300 hover:bg-gray-50 hover:text-red-700';
+            const text = active ? '★ 已加入错题本' : '☆ 加入错题本';
+            return '<button type="button" data-mistake-id="' + escapeHtml(qid) + '" onclick="toggleMistake(' + jsArg(qid) + ')" class="' + cls + '">' + text + '</button>';
+        }
+
+        function updateMistakeButtons(qid) {
+            document.querySelectorAll('[data-mistake-id="' + CSS.escape(qid) + '"]').forEach(function(btn) {
+                const active = isMistake(qid);
+                btn.textContent = active ? '★ 已加入错题本' : '☆ 加入错题本';
+                btn.className = active
+                    ? 'mistake-toggle-btn is-mistake border px-3 py-1 rounded text-xs font-bold flex items-center gap-1 bg-red-50 text-red-600 border-red-500 hover:bg-red-100'
+                    : 'mistake-toggle-btn border px-3 py-1 rounded text-xs font-bold flex items-center gap-1 bg-white text-gray-500 border-gray-300 hover:bg-gray-50 hover:text-red-700';
+            });
+        }
+
+        window.toggleMistake = function(qid) {
+            const subjectId = qid.split('::')[0];
+            const set = getMistakeSet(subjectId);
+            if (set.has(qid)) {
+                set.delete(qid);
+                showToast('已移出' + SUBJECTS[subjectId].name + '错题本');
+            } else {
+                set.add(qid);
+                showToast('已加入' + SUBJECTS[subjectId].name + '错题本');
+            }
+            saveMistakes(subjectId);
+            renderSidebar();
+            if (currentChapterKey === 'mistake_review') renderContent();
+            else updateMistakeButtons(qid);
+        };
+
+        function addMistake(qid, silent) {
+            const subjectId = qid.split('::')[0];
+            const set = getMistakeSet(subjectId);
+            const before = set.size;
+            set.add(qid);
+            saveMistakes(subjectId);
+            renderSidebar();
+            updateMistakeButtons(qid);
+            if (!silent && set.size !== before) showToast('已加入' + SUBJECTS[subjectId].name + '错题本');
+        }
+
+        function showToast(msg) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-20 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg text-sm z-50 fade-enter';
+            toast.innerText = msg;
+            document.body.appendChild(toast);
+            setTimeout(function() { toast.remove(); }, 1800);
+        }
+
+        function shuffleCopy(list) {
+            const arr = list.slice();
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                const temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+            }
+            return arr;
+        }
+
+        function updateModeButtons() {
+            document.querySelectorAll('.mode-btn').forEach(function(btn) {
+                btn.className = modeClass + ' text-gray-600 hover:text-red-700';
+            });
+            const activeBtn = document.getElementById('btn-' + currentMode);
+            if (activeBtn) activeBtn.className = modeClass + ' bg-white text-red-800 shadow-sm';
+        }
+
+        function renderSidebar() {
+            const subjectList = document.getElementById('subject-list');
+            subjectList.innerHTML = subjectOrder.map(function(id) {
+                const subject = SUBJECTS[id];
+                const active = id === currentSubjectId;
+                const cls = 'subject-btn ' + (active ? 'active' : 'text-gray-700 hover:border-red-200');
+                return '<button class="' + cls + '" onclick="switchSubject(' + jsArg(id) + ')">' +
+                    '<span class="flex items-center gap-2 min-w-0"><span class="subject-icon">' + escapeHtml(subject.icon) + '</span><span class="truncate">' + escapeHtml(subject.name) + '</span></span>' +
+                    '<span class="text-xs text-gray-400 font-mono">' + countQuestions(id) + '</span>' +
+                '</button>';
+            }).join('');
+
+            const subject = SUBJECTS[currentSubjectId];
+            const list = document.getElementById('chapter-list');
+            const mistakeCount = getMistakeSet(currentSubjectId).size;
+            let html = '';
+            html += '<div class="section-label">专项</div>';
+            html += '<button class="chapter-btn mb-3 border ' + (currentChapterKey === 'mistake_review' ? 'active bg-red-50 text-red-900 border-red-800' : 'bg-white text-gray-600 border-gray-200 hover:border-red-300') + '" onclick="switchChapter(&quot;mistake_review&quot;)">📕 我的错题本 <span class="float-right bg-red-100 text-red-800 text-xs px-2 py-0.5 rounded-full font-mono">' + mistakeCount + '</span></button>';
+            html += '<div class="section-label">' + escapeHtml(subject.name) + '章节</div>';
+            Object.keys(subject.chapters).forEach(function(chapterKey) {
+                const active = chapterKey === currentChapterKey;
+                const chapterCount = subject.chapters[chapterKey].length;
+                html += '<button class="chapter-btn ' + (active ? 'active' : '') + '" title="' + escapeHtml(chapterKey) + '" onclick="switchChapter(' + jsArg(chapterKey) + ')">' + escapeHtml(chapterKey) + '<span class="float-right text-xs text-gray-400 font-mono ml-2">' + chapterCount + '</span></button>';
+            });
+            html += '<div class="mt-4 pt-4 border-t border-gray-100 text-center text-xs text-gray-400">Developed by Spong Xia</div>';
+            list.innerHTML = html;
+        }
+
+        window.switchSubject = function(subjectId) {
+            if (!SUBJECTS[subjectId] || subjectId === currentSubjectId) return;
+            currentSubjectId = subjectId;
+            currentChapterKey = firstChapterKey(subjectId);
+            cardIndex = 0;
+            resetRuns();
+            renderSidebar();
+            renderContent();
+            if (window.innerWidth < 768) toggleMobileSidebar();
+        };
+
+        window.switchChapter = function(chapterKey) {
+            currentChapterKey = chapterKey;
+            cardIndex = 0;
+            resetRuns();
+            renderSidebar();
+            renderContent();
+            if (window.innerWidth < 768) toggleMobileSidebar();
+        };
+
+        window.switchMode = function(mode) {
+            currentMode = mode;
+            if (mode === 'practice') practiceState.status = 'setup';
+            if (mode === 'exam') examState.status = 'setup';
+            updateModeButtons();
+            renderContent();
+        };
+
+        window.toggleMobileSidebar = function() {
+            const aside = document.getElementById('main-sidebar');
+            aside.classList.toggle('hidden');
+            aside.classList.toggle('fixed');
+            aside.classList.toggle('inset-y-0');
+            aside.classList.toggle('left-0');
+            aside.classList.toggle('h-full');
+            aside.classList.toggle('z-50');
+        };
+
+        function renderContent() {
+            const subject = SUBJECTS[currentSubjectId];
+            document.getElementById('brand-icon').textContent = subject.icon;
+            document.getElementById('subject-summary').textContent = subject.fullName + ' · ' + countQuestions(currentSubjectId) + ' 题';
+            const container = document.getElementById('app-content');
+            let data = activeQuestions();
+            if (cardIndex >= data.length) cardIndex = 0;
+            const title = currentChapterKey === 'mistake_review' ? subject.name + ' · 我的错题本' : subject.name + ' · ' + currentChapterKey;
+            document.getElementById('current-title').textContent = title;
+            container.innerHTML = '';
+            container.className = 'flex-1 overflow-y-auto p-4 md:p-8 pb-20 relative bg-[#fdfbf7]';
+
+            if (currentChapterKey === 'mistake_review' && data.length === 0 && currentMode !== 'exam' && currentMode !== 'practice') {
+                renderEmptyState(container, subject.name + '错题本为空', '在背诵、刷题或模拟考试中标记错题后，会在这里按科目单独归档。');
+                return;
+            }
+
+            if (currentMode === 'mask') renderMaskMode(container, data);
+            else if (currentMode === 'flashcard') renderFlashcardMode(container, data);
+            else if (currentMode === 'cloze') renderClozeMode(container, data);
+            else if (currentMode === 'practice') renderPracticeMode(container);
+            else if (currentMode === 'exam') renderExamMode(container);
+        }
+
+        function renderEmptyState(container, title, text) {
+            container.innerHTML = '<div class="flex flex-col items-center justify-center h-full text-center text-gray-500">' +
+                '<div class="text-6xl mb-4">📭</div>' +
+                '<h3 class="text-xl font-bold text-gray-800 mb-2">' + escapeHtml(title) + '</h3>' +
+                '<p class="text-sm bg-gray-100 px-4 py-2 rounded-lg max-w-md">' + escapeHtml(text) + '</p>' +
+            '</div>';
+        }
+
+        function renderMaskMode(container, data) {
+            if (data.length === 0) return renderEmptyState(container, '暂无题目', '当前范围没有可展示的题目。');
+            const tools = document.createElement('div');
+            tools.className = 'flex justify-end mb-4 gap-2';
+            tools.innerHTML = '<button onclick="toggleAllKeywords(true)" class="text-xs bg-red-50 text-red-800 px-2 py-1 rounded">全部显示</button>' +
+                '<button onclick="toggleAllKeywords(false)" class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">全部遮挡</button>';
+            container.appendChild(tools);
+            data.forEach(function(item, idx) {
+                const card = document.createElement('div');
+                card.className = 'bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6 transition hover:shadow-md';
+                card.innerHTML = '<div class="flex gap-4">' +
+                    '<div class="shrink-0 w-8 h-8 flex items-center justify-center bg-red-50 text-red-800 font-bold rounded-lg text-sm">' + (idx + 1) + '</div>' +
+                    '<div class="w-full min-w-0">' +
+                        '<div class="flex flex-col md:flex-row md:items-start md:justify-between gap-3 mb-3">' +
+                            '<h3 class="font-bold text-gray-800 text-lg leading-snug">' + escapeHtml(item.q) + '</h3>' + renderMistakeButton(item.id) +
+                        '</div>' +
+                        '<div class="text-gray-600 leading-relaxed border-t border-gray-100 pt-3 text-base">' + maskAnswerHtml(item.a) + '</div>' +
+                    '</div>' +
+                '</div>';
+                container.appendChild(card);
+            });
+        }
+
+        window.toggleAllKeywords = function(show) {
+            document.querySelectorAll('.kw-mask').forEach(function(m) { show ? m.classList.add('revealed') : m.classList.remove('revealed'); });
+        };
+
+        function renderFlashcardMode(container, data) {
+            if (data.length === 0) return renderEmptyState(container, '暂无题目', '当前范围没有可展示的抽认卡。');
+            container.className = 'flex-1 flex flex-col items-center justify-start md:justify-center overflow-y-auto p-4 md:p-8 pb-24 bg-gray-50';
+            const item = data[cardIndex];
+            const wrapper = document.createElement('div');
+            wrapper.className = 'w-full max-w-2xl text-center';
+            wrapper.innerHTML = '<div class="flex justify-between items-center mb-4 gap-3">' +
+                    '<div class="text-xs text-gray-400 font-mono">CARD ' + (cardIndex + 1) + ' / ' + data.length + '</div>' + renderMistakeButton(item.id) +
+                '</div>' +
+                '<div class="perspective-1000 w-full h-[70vh] max-h-[34rem] min-h-[28rem] cursor-pointer group select-none" onclick="this.querySelector(&quot;.card-inner&quot;).classList.toggle(&quot;rotate-y-180&quot;)">' +
+                    '<div class="card-inner w-full h-full relative transition-transform duration-500 transform-style-3d shadow-xl rounded-2xl">' +
+                        '<div class="absolute w-full h-full backface-hidden bg-white rounded-2xl p-8 flex flex-col justify-center items-center border-2 border-white">' +
+                            '<h3 class="text-xl md:text-2xl font-bold text-gray-800">' + escapeHtml(item.q) + '</h3>' +
+                            '<p class="text-red-400 text-xs mt-8 animate-pulse">点击翻转</p>' +
+                        '</div>' +
+                        '<div class="absolute w-full h-full backface-hidden bg-red-50 rounded-2xl p-6 md:p-8 pb-10 flex flex-col justify-start items-start text-left border-2 border-red-200 rotate-y-180 overflow-y-auto overscroll-contain">' +
+                            '<div class="text-gray-800 text-base leading-relaxed w-full">' + answerHtml(item.a) + '</div>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="flex justify-center gap-6 mt-8">' +
+                    '<button onclick="switchCard(-1, ' + data.length + ')" class="w-12 h-12 rounded-full bg-white shadow hover:bg-gray-100 text-xl">←</button>' +
+                    '<button onclick="switchCard(1, ' + data.length + ')" class="w-12 h-12 rounded-full bg-red-800 text-white shadow hover:bg-red-700 text-xl">→</button>' +
+                '</div>';
+            container.appendChild(wrapper);
+        }
+
+        window.switchCard = function(step, total) {
+            cardIndex = (cardIndex + step + total) % total;
+            renderContent();
+        };
+
+        function renderClozeMode(container, data) {
+            if (data.length === 0) return renderEmptyState(container, '暂无题目', '当前范围没有可填空的题目。');
+            const tip = document.createElement('div');
+            tip.className = 'mb-6 text-center text-sm text-gray-500 bg-red-50 py-2 rounded';
+            tip.innerHTML = '💡 技巧：输入后按 <b>Enter</b> 或 <b>Tab</b> 自动跳转下一空。双击显示答案。';
+            container.appendChild(tip);
+            data.forEach(function(item, idx) {
+                const card = document.createElement('div');
+                card.className = 'bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8';
+                const parts = normalizeBreaks(item.a).split(/<span class='kw'>|<\/span>/);
+                let body = '';
+                parts.forEach(function(part, i) {
+                    if (i % 2 === 0) body += part;
+                    else {
+                        const width = Math.max(100, part.length * 24);
+                        body += '<input type="text" class="cloze-input" style="width:' + width + 'px" placeholder="???" data-ans="' + escapeHtml(part) + '" autocomplete="off" onblur="checkCloze(this)" onkeydown="handleClozeNav(event, this)" ondblclick="revealCloze(this)">';
+                    }
+                });
+                card.innerHTML = '<div class="flex flex-col md:flex-row md:justify-between md:items-start gap-3 mb-4">' +
+                        '<div class="font-bold text-gray-800 text-lg border-l-4 border-red-800 pl-3">' + (idx + 1) + '. ' + escapeHtml(item.q) + '</div>' + renderMistakeButton(item.id) +
+                    '</div>' +
+                    '<div class="leading-loose text-gray-700 text-lg cloze-container">' + body + '</div>';
+                container.appendChild(card);
+            });
+        }
+
+        window.checkCloze = function(input) {
+            if (!input.value) return;
+            const correct = input.getAttribute('data-ans');
+            if (input.value.trim() === correct) {
+                input.classList.add('correct');
+                input.classList.remove('wrong');
+            } else {
+                input.classList.add('wrong');
+            }
+        };
+
+        window.revealCloze = function(input) {
+            input.value = input.getAttribute('data-ans');
+            input.classList.add('correct');
+            input.classList.remove('wrong');
+        };
+
+        window.handleClozeNav = function(e, input) {
+            if (e.keyCode === 13 || e.keyCode === 9) {
+                if (e.keyCode === 13) e.preventDefault();
+                checkCloze(input);
+                const allInputs = Array.from(document.querySelectorAll('.cloze-input'));
+                const index = allInputs.indexOf(input);
+                if (index > -1 && index < allInputs.length - 1) allInputs[index + 1].focus();
+                else input.blur();
+            }
+        };
+
+        function practicePool(scope) {
+            if (scope === 'all') return allQuestions(currentSubjectId);
+            if (scope === 'mistakes') return mistakeQuestions(currentSubjectId);
+            if (currentChapterKey === 'mistake_review') return mistakeQuestions(currentSubjectId);
+            return questionsForChapters(currentSubjectId, [currentChapterKey]);
+        }
+
+        function practiceScopeLabel(scope) {
+            if (scope === 'all') return '本科全部章节';
+            if (scope === 'mistakes') return '本科错题本';
+            return currentChapterKey === 'mistake_review' ? '当前错题本' : '当前章节';
+        }
+
+        function renderPracticeMode(container) {
+            if (practiceState.status !== 'active' || practiceState.subjectId !== currentSubjectId) {
+                if (practiceState.subjectId !== currentSubjectId) practiceState = blankPracticeState();
+                practiceState.subjectId = currentSubjectId;
+                renderPracticeSetup(container);
+                return;
+            }
+            renderPracticeCard(container);
+        }
+
+        function renderPracticeSetup(container) {
+            const scopes = ['current', 'all', 'mistakes'];
+            let scopeHtml = '';
+            scopes.forEach(function(scope) {
+                const count = practicePool(scope).length;
+                const active = practiceState.scope === scope;
+                scopeHtml += '<button onclick="setPracticeScope(' + jsArg(scope) + ')" class="w-full text-left p-4 rounded-lg border transition ' + (active ? 'border-red-800 bg-red-50 text-red-900' : 'border-gray-200 bg-white hover:border-red-300') + '">' +
+                    '<div class="flex justify-between items-center gap-3"><span class="font-bold">' + escapeHtml(practiceScopeLabel(scope)) + '</span><span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">' + count + ' 题</span></div>' +
+                    '<div class="text-xs text-gray-500 mt-1">随机出题，刷完自动重新洗牌继续。</div>' +
+                '</button>';
+            });
+            container.innerHTML = '<div class="max-w-xl mx-auto h-full flex flex-col justify-center">' +
+                '<div class="text-center mb-8"><div class="text-6xl mb-4">♾️</div><h2 class="text-2xl font-bold text-gray-800">无限刷题</h2><p class="text-gray-500 text-sm mt-2">选择刷题范围后开始，题目会无限循环。</p></div>' +
+                '<div class="space-y-3">' + scopeHtml + '</div>' +
+                '<button onclick="startPractice()" class="mt-6 w-full bg-red-800 text-white py-4 rounded-lg font-bold hover:bg-red-700 shadow-md transition">开始刷题</button>' +
+            '</div>';
+        }
+
+        window.setPracticeScope = function(scope) {
+            practiceState.scope = scope;
+            renderContent();
+        };
+
+        window.startPractice = function() {
+            const pool = practicePool(practiceState.scope);
+            if (pool.length === 0) { alert('当前范围没有题目。'); return; }
+            practiceState = { status: 'active', subjectId: currentSubjectId, scope: practiceState.scope, questions: shuffleCopy(pool), currentIndex: 0, showAnswer: false, answeredCount: 0, round: 1 };
+            renderContent();
+        };
+
+        function renderPracticeCard(container) {
+            const q = practiceState.questions[practiceState.currentIndex];
+            container.innerHTML = '<div class="max-w-3xl mx-auto flex flex-col h-full">' +
+                '<div class="flex justify-between items-center mb-4 shrink-0 gap-3">' +
+                    '<div class="text-xs font-bold text-gray-500 tracking-wider">♾️ 无限刷题 <span class="ml-2 bg-gray-200 px-2 py-0.5 rounded text-gray-700">已刷 ' + (practiceState.answeredCount + 1) + ' 题 · 第 ' + practiceState.round + ' 轮</span></div>' +
+                    '<div class="flex gap-2">' + renderMistakeButton(q.id) + '<button onclick="resetPractice()" class="text-gray-400 hover:text-red-600 px-2 text-xl" title="退出">×</button></div>' +
+                '</div>' +
+                '<div class="w-full bg-gray-200 h-1.5 rounded-full mb-6 shrink-0 overflow-hidden"><div class="bg-red-800 h-1.5 rounded-full w-full"></div></div>' +
+                '<div class="flex-1 bg-white rounded-xl shadow-sm border border-gray-100 p-6 md:p-10 overflow-y-auto flex flex-col relative">' +
+                    '<div class="mb-8"><div class="text-xs text-gray-400 mb-2">' + escapeHtml(q.chapterName) + '</div><h3 class="text-xl md:text-2xl font-bold text-gray-800 leading-snug">' + escapeHtml(q.q) + '</h3></div>' +
+                    '<div class="' + (practiceState.showAnswer ? 'block fade-enter' : 'hidden') + ' flex-1 border-t border-dashed border-gray-200 pt-6"><div class="text-gray-400 text-xs uppercase font-bold mb-2">Answer</div><div class="text-gray-700 leading-relaxed text-lg">' + answerHtml(q.a) + '</div></div>' +
+                    '<div class="' + (!practiceState.showAnswer ? 'flex' : 'hidden') + ' flex-1 items-center justify-center text-gray-300 flex-col py-10"><span class="text-4xl mb-2">🙈</span><span class="text-sm">先回忆，再查看答案</span></div>' +
+                '</div>' +
+                '<div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-3 shrink-0">' +
+                    '<button onclick="togglePracticeAnswer()" class="py-3 rounded-lg font-bold text-white shadow-md transition ' + (practiceState.showAnswer ? 'bg-gray-600 hover:bg-gray-700' : 'bg-red-800 hover:bg-red-700') + '">' + (practiceState.showAnswer ? '隐藏答案' : '查看答案') + '</button>' +
+                    '<button onclick="practiceMarkWrong()" class="py-3 rounded-lg font-bold bg-white border border-red-200 text-red-800 shadow-sm hover:bg-red-50 transition">答错，加入错题</button>' +
+                    '<button onclick="nextPracticeQuestion()" class="py-3 rounded-lg font-bold bg-white border border-gray-200 text-gray-700 shadow-sm hover:bg-gray-50 transition">下一题 →</button>' +
+                '</div>' +
+            '</div>';
+            updateMistakeButtons(q.id);
+        }
+
+        window.togglePracticeAnswer = function() {
+            practiceState.showAnswer = !practiceState.showAnswer;
+            renderContent();
+        };
+
+        window.practiceMarkWrong = function() {
+            const q = practiceState.questions[practiceState.currentIndex];
+            addMistake(q.id, false);
+            window.nextPracticeQuestion();
+        };
+
+        window.nextPracticeQuestion = function() {
+            practiceState.answeredCount += 1;
+            practiceState.currentIndex += 1;
+            if (practiceState.currentIndex >= practiceState.questions.length) {
+                const pool = practicePool(practiceState.scope);
+                practiceState.questions = shuffleCopy(pool.length ? pool : practiceState.questions);
+                practiceState.currentIndex = 0;
+                practiceState.round += 1;
+            }
+            practiceState.showAnswer = false;
+            renderContent();
+        };
+
+        window.resetPractice = function() {
+            practiceState.status = 'setup';
+            renderContent();
+        };
+
+        function ensureExamConfig() {
+            const chapters = Object.keys(SUBJECTS[currentSubjectId].chapters);
+            if (examState.subjectId !== currentSubjectId) {
+                examState = blankExamState();
+                examState.subjectId = currentSubjectId;
+                examState.selectedChapters = chapters.slice();
+                examState.questionCount = Math.min(10, Math.max(1, questionsForChapters(currentSubjectId, chapters).length));
+            }
+            if (examState.selectedChapters.length === 0) examState.selectedChapters = chapters.slice();
+        }
+
+        function selectedExamPool() {
+            ensureExamConfig();
+            return questionsForChapters(currentSubjectId, examState.selectedChapters);
+        }
+
+        function renderExamMode(container) {
+            ensureExamConfig();
+            if (examState.status === 'result') return renderExamResult(container);
+            if (examState.status !== 'active') return renderExamSetup(container);
+            renderExamCard(container);
+        }
+
+        function renderExamSetup(container) {
+            const chapters = Object.keys(SUBJECTS[currentSubjectId].chapters);
+            const poolCount = selectedExamPool().length;
+            examState.questionCount = Math.min(Math.max(1, Number(examState.questionCount) || 10), Math.max(1, poolCount));
+            let chapterHtml = '';
+            chapters.forEach(function(chapterKey) {
+                const checked = examState.selectedChapters.indexOf(chapterKey) !== -1;
+                const count = SUBJECTS[currentSubjectId].chapters[chapterKey].length;
+                chapterHtml += '<label class="range-option flex items-start gap-3 p-3 bg-white border ' + (checked ? 'border-red-200 bg-red-50/60' : 'border-gray-200') + ' rounded-lg cursor-pointer hover:border-red-300">' +
+                    '<input type="checkbox" class="mt-1" ' + (checked ? 'checked' : '') + ' onchange="toggleExamChapter(' + jsArg(chapterKey) + ', this.checked)">' +
+                    '<span class="min-w-0"><span class="block text-sm font-bold text-gray-800">' + escapeHtml(chapterKey) + '</span><span class="block text-xs text-gray-400 mt-1">' + count + ' 题</span></span>' +
+                '</label>';
+            });
+            container.innerHTML = '<div class="max-w-4xl mx-auto">' +
+                '<div class="text-center mb-8"><div class="text-6xl mb-4">📝</div><h2 class="text-2xl font-bold text-gray-800">模拟考试</h2><p class="text-gray-500 text-sm mt-2">选择考试章节和题目数量，系统随机组卷。</p></div>' +
+                '<div class="bg-white border border-gray-100 rounded-xl shadow-sm p-5 mb-5">' +
+                    '<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4"><div><h3 class="font-bold text-gray-800">考试范围</h3><p class="text-xs text-gray-500 mt-1">已选 ' + examState.selectedChapters.length + ' 章 · 可抽 ' + poolCount + ' 题</p></div>' +
+                    '<div class="flex gap-2"><button onclick="selectAllExamChapters()" class="text-xs bg-red-50 text-red-800 px-3 py-2 rounded font-bold">全选</button><button onclick="clearExamChapters()" class="text-xs bg-gray-100 text-gray-600 px-3 py-2 rounded font-bold">清空</button></div></div>' +
+                    '<div class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-80 overflow-y-auto pr-1">' + chapterHtml + '</div>' +
+                '</div>' +
+                '<div class="bg-white border border-gray-100 rounded-xl shadow-sm p-5">' +
+                    '<label class="block text-sm font-bold text-gray-800 mb-2" for="exam-count-input">题目数量</label>' +
+                    '<div class="flex flex-col md:flex-row gap-3 md:items-center"><input id="exam-count-input" type="number" min="1" max="' + Math.max(1, poolCount) + '" value="' + examState.questionCount + '" oninput="setExamCount(this.value)" class="w-full md:w-40 px-3 py-3 border border-gray-200 rounded-lg font-bold focus:outline-none focus:border-red-700">' +
+                    '<div class="flex gap-2"><button onclick="setExamCountPreset(5)" class="px-3 py-2 rounded bg-gray-100 text-gray-700 text-sm font-bold">5题</button><button onclick="setExamCountPreset(10)" class="px-3 py-2 rounded bg-gray-100 text-gray-700 text-sm font-bold">10题</button><button onclick="setExamCountPreset(20)" class="px-3 py-2 rounded bg-gray-100 text-gray-700 text-sm font-bold">20题</button></div></div>' +
+                    '<button onclick="startMockExam()" class="mt-5 w-full bg-gradient-to-r from-red-900 to-red-700 text-white py-4 rounded-lg font-bold hover:shadow-lg transition">开始模拟考试</button>' +
+                '</div>' +
+            '</div>';
+        }
+
+        window.toggleExamChapter = function(chapterKey, checked) {
+            ensureExamConfig();
+            const set = new Set(examState.selectedChapters);
+            checked ? set.add(chapterKey) : set.delete(chapterKey);
+            examState.selectedChapters = Array.from(set).filter(function(key) { return SUBJECTS[currentSubjectId].chapters[key]; });
+            const poolCount = selectedExamPool().length;
+            examState.questionCount = Math.min(Math.max(1, Number(examState.questionCount) || 10), Math.max(1, poolCount));
+            renderContent();
+        };
+
+        window.selectAllExamChapters = function() {
+            examState.selectedChapters = Object.keys(SUBJECTS[currentSubjectId].chapters);
+            renderContent();
+        };
+
+        window.clearExamChapters = function() {
+            examState.selectedChapters = [];
+            renderContent();
+        };
+
+        window.setExamCount = function(value) {
+            const poolCount = selectedExamPool().length;
+            examState.questionCount = Math.min(Math.max(1, Number(value) || 1), Math.max(1, poolCount));
+        };
+
+        window.setExamCountPreset = function(value) {
+            window.setExamCount(value);
+            renderContent();
+        };
+
+        window.startMockExam = function() {
+            const input = document.getElementById('exam-count-input');
+            if (input) window.setExamCount(input.value);
+            startExamFromConfig();
+        };
+
+        function startExamFromConfig() {
+            const pool = selectedExamPool();
+            if (examState.selectedChapters.length === 0) { alert('请至少选择一个考试章节。'); return; }
+            if (pool.length === 0) { alert('所选章节没有题目。'); return; }
+            const count = Math.min(Math.max(1, Number(examState.questionCount) || 10), pool.length);
+            examState.status = 'active';
+            examState.subjectId = currentSubjectId;
+            examState.questions = shuffleCopy(pool).slice(0, count);
+            examState.currentIndex = 0;
+            examState.showAnswer = false;
+            examState.score = 0;
+            renderContent();
+        }
+
+        function renderExamCard(container) {
+            const q = examState.questions[examState.currentIndex];
+            const total = examState.questions.length;
+            const progress = ((examState.currentIndex + 1) / total) * 100;
+            container.innerHTML = '<div class="max-w-3xl mx-auto flex flex-col h-full">' +
+                '<div class="flex justify-between items-center mb-4 shrink-0 gap-3">' +
+                    '<div class="text-xs font-bold text-gray-500 tracking-wider">📝 模拟考试 <span class="ml-2 bg-gray-200 px-2 py-0.5 rounded text-gray-700">' + (examState.currentIndex + 1) + ' / ' + total + '</span><span class="ml-2 bg-red-50 text-red-800 px-2 py-0.5 rounded">得分 ' + examState.score + '</span></div>' +
+                    '<div class="flex gap-2">' + renderMistakeButton(q.id) + '<button onclick="resetExam()" class="text-gray-400 hover:text-red-600 px-2 text-xl" title="退出">×</button></div>' +
+                '</div>' +
+                '<div class="w-full bg-gray-200 h-1.5 rounded-full mb-6 shrink-0 overflow-hidden"><div class="bg-red-800 h-1.5 rounded-full transition-all duration-300" style="width:' + progress + '%"></div></div>' +
+                '<div class="flex-1 bg-white rounded-xl shadow-sm border border-gray-100 p-6 md:p-10 overflow-y-auto flex flex-col relative">' +
+                    '<div class="mb-8"><div class="text-xs text-gray-400 mb-2">' + escapeHtml(q.chapterName) + '</div><h3 class="text-xl md:text-2xl font-bold text-gray-800 leading-snug">' + escapeHtml(q.q) + '</h3></div>' +
+                    '<div class="' + (examState.showAnswer ? 'block fade-enter' : 'hidden') + ' flex-1 border-t border-dashed border-gray-200 pt-6"><div class="text-gray-400 text-xs uppercase font-bold mb-2">Answer</div><div class="text-gray-700 leading-relaxed text-lg">' + answerHtml(q.a) + '</div></div>' +
+                    '<div class="' + (!examState.showAnswer ? 'flex' : 'hidden') + ' flex-1 items-center justify-center text-gray-300 flex-col py-10"><span class="text-4xl mb-2">🙈</span><span class="text-sm">先作答，再查看答案并自评</span></div>' +
+                '</div>' +
+                '<div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-3 shrink-0">' +
+                    '<button onclick="toggleExamAnswerState()" class="py-3 rounded-lg font-bold text-white shadow-md transition ' + (examState.showAnswer ? 'bg-gray-600 hover:bg-gray-700' : 'bg-red-800 hover:bg-red-700') + '">' + (examState.showAnswer ? '隐藏答案' : '查看答案') + '</button>' +
+                    '<button onclick="gradeExam(false)" ' + (!examState.showAnswer ? 'disabled' : '') + ' class="py-3 rounded-lg font-bold bg-white border border-red-200 text-red-800 shadow-sm hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed transition">答错，加入错题</button>' +
+                    '<button onclick="gradeExam(true)" ' + (!examState.showAnswer ? 'disabled' : '') + ' class="py-3 rounded-lg font-bold bg-white border border-gray-200 text-gray-700 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition">答对，下一题</button>' +
+                '</div>' +
+            '</div>';
+            updateMistakeButtons(q.id);
+        }
+
+        window.toggleExamAnswerState = function() {
+            examState.showAnswer = !examState.showAnswer;
+            renderContent();
+        };
+
+        window.gradeExam = function(isCorrect) {
+            const q = examState.questions[examState.currentIndex];
+            if (isCorrect) examState.score += 1;
+            else addMistake(q.id, false);
+            if (examState.currentIndex < examState.questions.length - 1) {
+                examState.currentIndex += 1;
+                examState.showAnswer = false;
+            } else {
+                examState.status = 'result';
+            }
+            renderContent();
+        };
+
+        function renderExamResult(container) {
+            const total = examState.questions.length;
+            const percent = total ? Math.round((examState.score / total) * 100) : 0;
+            container.innerHTML = '<div class="max-w-lg mx-auto h-full flex flex-col items-center justify-center text-center">' +
+                '<div class="text-6xl mb-5">🎉</div>' +
+                '<h2 class="text-2xl font-bold text-gray-800 mb-2">考试完成</h2>' +
+                '<p class="text-sm text-gray-500 mb-6">' + SUBJECTS[currentSubjectId].name + ' · ' + examState.questions.length + ' 题</p>' +
+                '<div class="text-6xl font-black text-red-800 mb-2">' + examState.score + '<span class="text-2xl text-gray-400 font-normal">/' + total + '</span></div>' +
+                '<div class="text-gray-600 mb-8">正确率 ' + percent + '%</div>' +
+                '<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">' +
+                    '<button onclick="startExamFromConfig()" class="bg-red-800 text-white px-6 py-3 rounded-lg shadow hover:bg-red-700 font-bold">按当前范围再考</button>' +
+                    '<button onclick="resetExam()" class="bg-white text-gray-700 border border-gray-200 px-6 py-3 rounded-lg shadow-sm hover:bg-gray-50 font-bold">返回设置</button>' +
+                '</div>' +
+            '</div>';
+        }
+
+        window.resetExam = function() {
+            examState.status = 'setup';
+            examState.questions = [];
+            examState.currentIndex = 0;
+            examState.showAnswer = false;
+            examState.score = 0;
+            renderContent();
+        };
+
+        function init() {
+            loadMistakes();
+            renderSidebar();
+            updateModeButtons();
+            renderContent();
+        }
+
+        init();
+    </script>
+</body>
+</html>
