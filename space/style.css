@@ -78,14 +78,14 @@ body { font-family:var(--font-body); color:var(--text); background:var(--bg); mi
 /* SUBJECT HEADER */
 .subject-header { background:var(--card); border-radius:var(--radius); padding:20px 24px; margin-bottom:20px; box-shadow:var(--shadow); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; }
 .subject-header h2 { font-family:var(--font-cute); font-size:24px; }
-.subject-header.math-analysis h2, .subject-header.math-linalg h2 { color:var(--c-math); }
-.subject-header.physics-mech h2, .subject-header.physics-elec h2 { color:var(--c-physics); }
-.subject-header.cs h2 { color:var(--c-cs); }
-.subject-header.ai h2 { color:var(--c-ai); }
-.subject-header.math-analysis, .subject-header.math-linalg { border-left:5px solid var(--c-math); }
-.subject-header.physics-mech, .subject-header.physics-elec { border-left:5px solid var(--c-physics); }
-.subject-header.cs { border-left:5px solid var(--c-cs); }
-.subject-header.ai { border-left:5px solid var(--c-ai); }
+.subject-header.math-analysis h2, .subject-header.math-ode h2 { color:var(--c-math); }
+.subject-header.physics-mech h2, .subject-header.physics-general h2 { color:var(--c-physics); }
+.subject-header.cs-ics h2, .subject-header.cs-dsa h2 { color:var(--c-cs); }
+.subject-header.research h2 { color:var(--c-ai); }
+.subject-header.math-analysis, .subject-header.math-ode { border-left:5px solid var(--c-math); }
+.subject-header.physics-mech, .subject-header.physics-general { border-left:5px solid var(--c-physics); }
+.subject-header.cs-ics, .subject-header.cs-dsa { border-left:5px solid var(--c-cs); }
+.subject-header.research { border-left:5px solid var(--c-ai); }
 .subject-links { display:flex; gap:8px; }
 .subject-links a { padding:6px 14px; border-radius:20px; font-size:12px; text-decoration:none; color:#fff; transition:all .2s; }
 .subject-links a:hover { transform:translateY(-1px); box-shadow:0 3px 10px rgba(0,0,0,.15); }
@@ -173,28 +173,54 @@ body { font-family:var(--font-body); color:var(--text); background:var(--bg); mi
 .task-form input,.task-form textarea { padding:10px 14px; border:2px solid var(--border); border-radius:var(--radius-xs); font-family:var(--font-body); font-size:13px; color:var(--text); transition:border-color .2s; }
 .task-form input:focus,.task-form textarea:focus { outline:none; border-color:var(--orange-light); }
 .task-form textarea { min-height:50px; resize:vertical; }
+.task-form .task-steps-input { min-height:66px; }
 .task-form-bottom { display:flex; gap:8px; align-items:center; }
 .task-form-bottom select { padding:8px 12px; border:2px solid var(--border); border-radius:var(--radius-xs); font-family:var(--font-body); font-size:13px; color:var(--text); background:#fff; }
 .task-date-group { margin-bottom:20px; }
 .task-date-label { font-family:var(--font-cute); font-size:16px; color:var(--text-light); margin-bottom:10px; padding-bottom:4px; border-bottom:1px dashed var(--border); }
 .task-card { background:var(--card); border-radius:var(--radius-sm); padding:14px 18px; margin-bottom:8px; box-shadow:var(--shadow); display:flex; align-items:flex-start; gap:12px; transition:all .25s; }
 .task-card.done { opacity:.55; }
-.task-check { width:22px; height:22px; border-radius:50%; border:2px solid var(--border); background:#fff; cursor:pointer; flex-shrink:0; margin-top:2px; display:flex; align-items:center; justify-content:center; font-size:12px; transition:all .2s; }
+.task-check { width:22px; height:22px; padding:0; border-radius:50%; border:2px solid var(--border); background:#fff; cursor:pointer; flex-shrink:0; margin-top:2px; display:flex; align-items:center; justify-content:center; font-size:12px; transition:all .2s; }
 .task-check:hover { border-color:var(--mint); }
 .task-card.done .task-check { background:var(--mint); border-color:var(--mint); color:#fff; }
 .task-content { flex:1; min-width:0; }
 .task-title { font-size:14px; font-weight:500; }
 .task-card.done .task-title { text-decoration:line-through; color:var(--text-light); }
 .task-detail { font-size:12px; color:var(--text-light); margin-top:4px; white-space:pre-wrap; }
-.task-meta { display:flex; gap:6px; margin-top:6px; }
+.task-meta { display:flex; align-items:center; gap:8px; margin-top:8px; }
 .task-tag { font-size:11px; padding:2px 8px; border-radius:20px; }
 .task-tag-math { background:#FFE0EB; color:var(--c-math); }
 .task-tag-physics { background:#E0EDFF; color:var(--c-physics); }
 .task-tag-cs { background:#E0F5EB; color:var(--c-cs); }
 .task-tag-ai { background:#EDE0F5; color:var(--c-ai); }
 .task-tag-general { background:#F0F0F5; color:var(--text-light); }
-.task-delete { background:none; border:none; color:var(--text-light); cursor:pointer; font-size:14px; opacity:0; transition:opacity .2s; padding:2px 6px; }
-.task-card:hover .task-delete { opacity:1; }
+.task-progress { font-size:11px; color:var(--text-light); }
+.task-actions { display:flex; align-items:center; gap:2px; opacity:0; transition:opacity .2s; }
+.task-card:hover .task-actions, .task-card:focus-within .task-actions { opacity:1; }
+.task-edit,.task-delete { background:none; border:none; color:var(--text-light); cursor:pointer; font-size:12px; padding:3px 6px; }
+.task-edit:hover { color:var(--primary); }
+.task-delete { font-size:14px; }
+.task-delete:hover { color:var(--danger); }
+.task-steps { display:flex; flex-direction:column; gap:6px; margin-top:10px; padding:9px 10px; border-left:2px solid var(--border); background:rgba(255,255,255,.45); border-radius:0 var(--radius-xs) var(--radius-xs) 0; }
+.task-step { display:flex; align-items:flex-start; gap:8px; color:var(--text); font-size:12px; line-height:18px; }
+.task-step.done span { color:var(--text-light); text-decoration:line-through; }
+.task-step-check { width:18px; height:18px; padding:0; flex:0 0 18px; display:inline-flex; align-items:center; justify-content:center; border:2px solid var(--border); border-radius:5px; background:#fff; color:#fff; cursor:pointer; font-size:11px; transition:all .2s; }
+.task-step-check:hover { border-color:var(--mint); }
+.task-step-check.checked { border-color:var(--mint); background:var(--mint); }
+.task-card-edit { display:block; opacity:1; border:2px solid var(--primary-light); }
+.task-edit-form { display:flex; flex-direction:column; gap:8px; }
+.task-edit-form input,.task-edit-form textarea,.task-edit-form select { width:100%; padding:9px 12px; border:2px solid var(--border); border-radius:var(--radius-xs); background:#fff; color:var(--text); font-family:var(--font-body); font-size:13px; }
+.task-edit-form input:focus,.task-edit-form textarea:focus,.task-edit-form select:focus { outline:none; border-color:var(--primary-light); }
+.task-edit-detail { min-height:54px; resize:vertical; }
+.task-edit-steps { display:flex; flex-direction:column; gap:6px; padding:10px; background:var(--bg); border-radius:var(--radius-xs); }
+.task-edit-steps-label { font-size:12px; color:var(--text-light); font-weight:500; }
+.task-edit-step { display:flex; align-items:center; gap:7px; }
+.task-edit-step .task-edit-step-input { flex:1; min-width:0; padding:7px 9px; }
+.task-step-remove { border:none; background:transparent; color:var(--text-light); cursor:pointer; padding:4px; }
+.task-step-remove:hover { color:var(--danger); }
+.task-add-step { align-self:flex-start; padding:5px 8px; border:1px dashed var(--border); border-radius:var(--radius-xs); background:#fff; color:var(--text-light); cursor:pointer; font-family:var(--font-body); font-size:12px; }
+.task-add-step:hover { border-color:var(--primary); color:var(--primary); }
+.task-edit-actions { display:flex; gap:8px; justify-content:flex-end; }
 .task-empty { text-align:center; padding:40px 20px; color:var(--text-light); }
 .task-empty .big-icon { font-size:48px; margin-bottom:12px; }
 
@@ -280,4 +306,7 @@ body.bg-viewing .bg-view-exit { display:flex; }
     .header-btn { padding:6px 8px; font-size:11px; }
     .header-btn .btn-icon { display:none; }
     .subject-header { flex-direction:column; align-items:flex-start; }
+    .task-actions { opacity:1; }
+    .task-form-bottom { align-items:stretch; flex-direction:column; }
+    .task-form-bottom .btn { justify-content:center; }
 }

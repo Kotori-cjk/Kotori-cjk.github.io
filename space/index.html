@@ -62,19 +62,22 @@
                         <div class="subject-group">
                             <div class="subject-group-header">📐 数学</div>
                             <button class="subject-btn sub active" data-subject="math-analysis"><span class="subj-icon">📊</span> 数分</button>
-                            <button class="subject-btn sub" data-subject="math-linalg"><span class="subj-icon">📏</span> 高代</button>
+                            <button class="subject-btn sub" data-subject="math-ode"><span class="subj-icon">〰️</span> 常微分方程</button>
                         </div>
                         <div class="subject-group">
                             <div class="subject-group-header">⚛️ 物理</div>
-                            <button class="subject-btn sub" data-subject="physics-mech"><span class="subj-icon">🔧</span> 力学</button>
-                            <button class="subject-btn sub" data-subject="physics-elec"><span class="subj-icon">⚡</span> 电学</button>
+                            <button class="subject-btn sub" data-subject="physics-mech"><span class="subj-icon">⚙️</span> 理力</button>
+                            <button class="subject-btn sub" data-subject="physics-general"><span class="subj-icon">🧲</span> 普物</button>
                         </div>
-                        <button class="subject-btn" data-subject="cs"><span class="subj-icon">💻</span> 程设</button>
-                        <button class="subject-btn" data-subject="ai"><span class="subj-icon">🤖</span> AI引论</button>
+                        <div class="subject-group">
+                            <div class="subject-group-header">💻 计算机</div>
+                            <button class="subject-btn sub" data-subject="cs-ics"><span class="subj-icon">🖥️</span> ICS</button>
+                            <button class="subject-btn sub" data-subject="cs-dsa"><span class="subj-icon">🧮</span> 数算</button>
+                        </div>
+                        <button class="subject-btn" data-subject="research"><span class="subj-icon">🔬</span> 科研</button>
                         <a class="subject-btn subject-link" href="https://Kotori-cjk.github.io/luogu-journey/" target="_blank"><span class="subj-icon">🏆</span> 算法 ↗</a>
                         <a class="subject-btn subject-link code-analysis-link" href="https://kotori-cjk.github.io/luogu-ai-journey/" target="_blank"><span class="subj-icon">🔮</span> Code Analysis ↗</a>
                         <a class="subject-btn subject-link" href="politics-recite/"><span class="subj-icon">📕</span> 思政背诵 ↗</a>
-                        <a class="subject-btn subject-link" href="ai-recite/"><span class="subj-icon">🧠</span> AI背诵 ↗</a>
                     </div>
                 </div>
 
@@ -123,31 +126,35 @@
                     <input type="text" id="set-obsidian-vault" placeholder="Obsidian Vault">
                     <label>📊 数分 笔记文件夹</label>
                     <input type="text" id="set-obs-math-analysis" placeholder="例：数分">
-                    <label>📏 高代 笔记文件夹</label>
-                    <input type="text" id="set-obs-math-linalg" placeholder="例：高代">
-                    <label>🔧 力学 笔记文件夹</label>
-                    <input type="text" id="set-obs-physics-mech" placeholder="例：力学">
-                    <label>⚡ 电学 笔记文件夹</label>
-                    <input type="text" id="set-obs-physics-elec" placeholder="例：电学">
-                    <label>💻 程设 笔记文件夹</label>
-                    <input type="text" id="set-obs-cs" placeholder="例：程设">
-                    <label>🤖 AI引论 笔记文件夹</label>
-                    <input type="text" id="set-obs-ai" placeholder="例：AI引论">
+                    <label>〰️ 常微分方程 笔记文件夹</label>
+                    <input type="text" id="set-obs-math-ode" placeholder="例：常微分方程">
+                    <label>⚙️ 理力 笔记文件夹</label>
+                    <input type="text" id="set-obs-physics-mech" placeholder="例：理力">
+                    <label>🧲 普物 笔记文件夹</label>
+                    <input type="text" id="set-obs-physics-general" placeholder="例：普物">
+                    <label>🖥️ ICS 笔记文件夹</label>
+                    <input type="text" id="set-obs-cs-ics" placeholder="例：ICS">
+                    <label>🧮 数算 笔记文件夹</label>
+                    <input type="text" id="set-obs-cs-dsa" placeholder="例：数算">
+                    <label>🔬 科研 笔记文件夹</label>
+                    <input type="text" id="set-obs-research" placeholder="例：科研">
                 </div>
                 <div class="settings-group">
                     <h3>🔗 NotebookLM 链接</h3>
                     <label>📊 数分</label>
                     <input type="text" id="set-nlm-math-analysis" placeholder="NotebookLM URL">
-                    <label>📏 高代</label>
-                    <input type="text" id="set-nlm-math-linalg" placeholder="NotebookLM URL">
-                    <label>🔧 力学</label>
+                    <label>〰️ 常微分方程</label>
+                    <input type="text" id="set-nlm-math-ode" placeholder="NotebookLM URL">
+                    <label>⚙️ 理力</label>
                     <input type="text" id="set-nlm-physics-mech" placeholder="NotebookLM URL">
-                    <label>⚡ 电学</label>
-                    <input type="text" id="set-nlm-physics-elec" placeholder="NotebookLM URL">
-                    <label>💻 程设</label>
-                    <input type="text" id="set-nlm-cs" placeholder="NotebookLM URL">
-                    <label>🤖 AI引论</label>
-                    <input type="text" id="set-nlm-ai" placeholder="NotebookLM URL">
+                    <label>🧲 普物</label>
+                    <input type="text" id="set-nlm-physics-general" placeholder="NotebookLM URL">
+                    <label>🖥️ ICS</label>
+                    <input type="text" id="set-nlm-cs-ics" placeholder="NotebookLM URL">
+                    <label>🧮 数算</label>
+                    <input type="text" id="set-nlm-cs-dsa" placeholder="NotebookLM URL">
+                    <label>🔬 科研</label>
+                    <input type="text" id="set-nlm-research" placeholder="NotebookLM URL">
                 </div>
                 <div class="settings-group">
                     <h3>🎨 背景图片</h3>

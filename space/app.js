@@ -2,15 +2,17 @@ const STORAGE_KEY = 'kotori-seika-v1';
 const EMOJIS = ['✿','❀','🌸','⭐','💫','🎀','🦋','🌙'];
 const PARENTS = {
   math:    { name:'数学', icon:'📐' },
-  physics: { name:'物理', icon:'⚛️' }
+  physics: { name:'物理', icon:'⚛️' },
+  computer:{ name:'计算机', icon:'💻' }
 };
 const SUBJECTS = {
   'math-analysis': { name:'数分', icon:'📊', color:'var(--c-math)', parent:'math' },
-  'math-linalg':   { name:'高代', icon:'📏', color:'var(--c-math)', parent:'math' },
-  'physics-mech':  { name:'力学', icon:'🔧', color:'var(--c-physics)', parent:'physics' },
-  'physics-elec':  { name:'电学', icon:'⚡', color:'var(--c-physics)', parent:'physics' },
-  'cs':            { name:'程设', icon:'💻', color:'var(--c-cs)' },
-  'ai':            { name:'AI引论', icon:'🤖', color:'var(--c-ai)' }
+  'math-ode':      { name:'常微分方程', icon:'〰️', color:'var(--c-math)', parent:'math' },
+  'physics-mech':  { name:'理力', icon:'⚙️', color:'var(--c-physics)', parent:'physics' },
+  'physics-general': { name:'普物', icon:'🧲', color:'var(--c-physics)', parent:'physics' },
+  'cs-ics':        { name:'ICS', icon:'🖥️', color:'var(--c-cs)', parent:'computer' },
+  'cs-dsa':        { name:'数算', icon:'🧮', color:'var(--c-cs)', parent:'computer' },
+  'research':      { name:'科研', icon:'🔬', color:'var(--c-ai)' }
 };
 const SUBJECT_KEYS = Object.keys(SUBJECTS);
 
@@ -62,21 +64,22 @@ function idbGetAll() {
 /* ===== State ===== */
 let state = {
   currentView: 'math-analysis',
-  notes: { 'math-analysis':{}, 'math-linalg':{}, 'physics-mech':{}, 'physics-elec':{}, cs:{}, ai:{} },
+  notes: { 'math-analysis':{}, 'math-ode':{}, 'physics-mech':{}, 'physics-general':{}, 'cs-ics':{}, 'cs-dsa':{}, research:{} },
   tasks: [],
   subjectLinks: {
-    'math-analysis':{ notebookLM:'' }, 'math-linalg':{ notebookLM:'' },
-    'physics-mech':{ notebookLM:'' }, 'physics-elec':{ notebookLM:'' },
-    cs:{ notebookLM:'' }, ai:{ notebookLM:'' }
+    'math-analysis':{ notebookLM:'' }, 'math-ode':{ notebookLM:'' },
+    'physics-mech':{ notebookLM:'' }, 'physics-general':{ notebookLM:'' },
+    'cs-ics':{ notebookLM:'' }, 'cs-dsa':{ notebookLM:'' }, research:{ notebookLM:'' }
   },
   settings: {
     obsidianVault: 'Obsidian Vault',
-    obsidianFolders: { 'math-analysis':'', 'math-linalg':'', 'physics-mech':'', 'physics-elec':'', cs:'', ai:'' },
+    obsidianFolders: { 'math-analysis':'', 'math-ode':'', 'physics-mech':'', 'physics-general':'', 'cs-ics':'', 'cs-dsa':'', research:'' },
     musicIds: [],
     backgrounds: [],
     currentBg: -1
   }
 };
+let editingTaskId = null;
 
 function save() {
   try {
@@ -113,6 +116,21 @@ function load() {
       if (!state.tasks) state.tasks = [];
       if (state.currentView==='math') state.currentView='math-analysis';
       if (state.currentView==='physics') state.currentView='physics-mech';
+      const subjectMigrations = {
+        'math-linalg':'math-ode',
+        'physics-elec':'physics-general',
+        'cs':'cs-ics',
+        'ai':'research'
+      };
+      Object.entries(subjectMigrations).forEach(([oldKey,newKey]) => {
+        ['notes','subjectLinks'].forEach(field => {
+          if (p[field]?.[oldKey] && !p[field]?.[newKey]) state[field][newKey] = p[field][oldKey];
+        });
+        if (p.settings?.obsidianFolders?.[oldKey] && !p.settings?.obsidianFolders?.[newKey]) {
+          state.settings.obsidianFolders[newKey] = p.settings.obsidianFolders[oldKey];
+        }
+        if (state.currentView === oldKey) state.currentView = newKey;
+      });
       ['notes','subjectLinks'].forEach(field => {
         if (state[field].math) { if(!state[field]['math-analysis']) state[field]['math-analysis']=state[field].math; delete state[field].math; }
         if (state[field].physics) { if(!state[field]['physics-mech']) state[field]['physics-mech']=state[field].physics; delete state[field].physics; }
@@ -126,6 +144,16 @@ function load() {
         if (!state.subjectLinks[k]) state.subjectLinks[k] = { notebookLM:'' };
         if (!state.settings.obsidianFolders[k]) state.settings.obsidianFolders[k] = '';
       });
+      const taskSubjectMigrations = { math:'math-analysis', physics:'physics-mech', cs:'cs-ics', ai:'research' };
+      state.tasks.forEach(task => {
+        if (!task.id) task.id = uid();
+        if (taskSubjectMigrations[task.subject]) task.subject = taskSubjectMigrations[task.subject];
+        if (!Array.isArray(task.steps)) task.steps = [];
+        task.steps = task.steps.map(step => typeof step === 'string'
+          ? { id:uid(), text:step, done:false }
+          : { id:step.id || uid(), text:step.text || '', done:!!step.done });
+      });
+      if (state.currentView !== 'tasks' && !SUBJECTS[state.currentView]) state.currentView = 'math-analysis';
     }
   } catch(e) { console.warn('Load failed',e); }
 }
@@ -489,6 +517,30 @@ function renderNotes(subj) {
 }
 
 /* ===== Task View ===== */
+function taskSubjectOptions(selected='') {
+  return `<option value="">通用</option>` + SUBJECT_KEYS.map(key => {
+    const subject = SUBJECTS[key];
+    const parent = subject.parent ? `${PARENTS[subject.parent].name} · ` : '';
+    return `<option value="${key}"${selected===key?' selected':''}>${subject.icon} ${parent}${subject.name}</option>`;
+  }).join('');
+}
+
+function taskTagClass(subject) {
+  if (subject?.startsWith('math-')) return 'task-tag-math';
+  if (subject?.startsWith('physics-')) return 'task-tag-physics';
+  if (subject?.startsWith('cs-')) return 'task-tag-cs';
+  if (subject === 'research') return 'task-tag-ai';
+  return 'task-tag-general';
+}
+
+function taskStepEditRow(step={ id:'', text:'', done:false }) {
+  return `<div class="task-edit-step" data-step-id="${escHtml(step.id || uid())}" data-done="${step.done?'true':'false'}">
+    <button type="button" class="task-step-check${step.done?' checked':''}" data-edit-step-toggle aria-label="切换子步骤状态">${step.done?'✓':''}</button>
+    <input type="text" class="task-edit-step-input" value="${escHtml(step.text)}" placeholder="子步骤内容">
+    <button type="button" class="task-step-remove" data-edit-step-remove aria-label="删除子步骤">✕</button>
+  </div>`;
+}
+
 function renderTaskView() {
   document.getElementById('subject-header').style.display = 'none';
   document.getElementById('view-notes').classList.remove('active');
@@ -502,13 +554,10 @@ function renderTaskView() {
     <div class="task-form">
       <input type="text" id="task-title-input" placeholder="任务标题">
       <textarea id="task-detail-input" placeholder="详情 (选填)"></textarea>
+      <textarea id="task-steps-input" class="task-steps-input" placeholder="子步骤（选填，每行一个）"></textarea>
       <div class="task-form-bottom">
         <select id="task-subject-select">
-          <option value="">通用</option>
-          <option value="math">📐 数学</option>
-          <option value="physics">⚛️ 物理</option>
-          <option value="cs">💻 程设</option>
-          <option value="ai">🤖 AI引论</option>
+          ${taskSubjectOptions()}
         </select>
         <button class="btn btn-orange btn-sm" id="task-add-btn">添加</button>
       </div>
@@ -529,16 +578,46 @@ function renderTaskView() {
     const label = date===todayStr ? `📅 今天 (${date})` : `📅 ${date}`;
     html += `<div class="task-date-group"><div class="task-date-label">${label}</div>`;
     byDate[date].forEach(t => {
-      const tagCls = t.subject ? `task-tag-${t.subject}` : 'task-tag-general';
-      const tagName = t.subject ? SUBJECTS[t.subject]?.name : '通用';
+      const tagCls = taskTagClass(t.subject);
+      const tagName = SUBJECTS[t.subject]?.name || '通用';
+      const steps = Array.isArray(t.steps) ? t.steps : [];
+      if (editingTaskId === t.id) {
+        html += `<div class="task-card task-card-edit" data-task-idx="${t._idx}">
+          <div class="task-edit-form">
+            <input type="text" class="task-edit-title" value="${escHtml(t.title)}" placeholder="任务标题">
+            <textarea class="task-edit-detail" placeholder="详情（选填）">${escHtml(t.detail || '')}</textarea>
+            <select class="task-edit-subject">${taskSubjectOptions(t.subject)}</select>
+            <div class="task-edit-steps">
+              <div class="task-edit-steps-label">子步骤</div>
+              ${steps.map(taskStepEditRow).join('')}
+              <button type="button" class="task-add-step" data-edit-step-add>＋ 添加子步骤</button>
+            </div>
+            <div class="task-edit-actions">
+              <button class="btn btn-primary btn-sm" data-task-save="${t._idx}">保存修改</button>
+              <button class="btn btn-secondary btn-sm" data-task-cancel>取消</button>
+            </div>
+          </div>
+        </div>`;
+        return;
+      }
+      const completedSteps = steps.filter(step => step.done).length;
       html += `<div class="task-card${t.done?' done':''}" data-task-idx="${t._idx}">
-        <div class="task-check" data-task-toggle="${t._idx}">${t.done?'✓':''}</div>
+        <button class="task-check" data-task-toggle="${t._idx}" aria-label="${t.done?'标记为未完成':'标记为完成'}">${t.done?'✓':''}</button>
         <div class="task-content">
           <div class="task-title">${escHtml(t.title)}</div>
           ${t.detail ? `<div class="task-detail">${escHtml(t.detail)}</div>` : ''}
-          <div class="task-meta"><span class="task-tag ${tagCls}">${tagName}</span></div>
+          ${steps.length ? `<div class="task-steps">
+            ${steps.map((step,stepIdx) => `<div class="task-step${step.done?' done':''}">
+              <button class="task-step-check${step.done?' checked':''}" data-task-step-toggle="${t._idx}" data-step-idx="${stepIdx}" aria-label="切换子步骤状态">${step.done?'✓':''}</button>
+              <span>${escHtml(step.text)}</span>
+            </div>`).join('')}
+          </div>` : ''}
+          <div class="task-meta"><span class="task-tag ${tagCls}">${tagName}</span>${steps.length ? `<span class="task-progress">${completedSteps}/${steps.length} 子步骤</span>` : ''}</div>
         </div>
-        <button class="task-delete" data-task-del="${t._idx}">✕</button>
+        <div class="task-actions">
+          <button class="task-edit" data-task-edit="${t._idx}">编辑</button>
+          <button class="task-delete" data-task-del="${t._idx}" aria-label="删除任务">✕</button>
+        </div>
       </div>`;
     });
     html += `</div>`;
@@ -640,6 +719,33 @@ async function importData(file) {
         subjectLinks:{...state.subjectLinks,...(d.subjectLinks||{})},
         notes:{...state.notes,...(d.notes||{})}};
       if(!state.tasks) state.tasks=[];
+      const importedSubjectMigrations = {
+        'math-linalg':'math-ode', 'physics-elec':'physics-general', 'cs':'cs-ics', 'ai':'research'
+      };
+      Object.entries(importedSubjectMigrations).forEach(([oldKey,newKey]) => {
+        ['notes','subjectLinks'].forEach(field => {
+          if (d[field]?.[oldKey] && !d[field]?.[newKey]) state[field][newKey] = d[field][oldKey];
+        });
+        if (d.settings?.obsidianFolders?.[oldKey] && !d.settings?.obsidianFolders?.[newKey]) {
+          state.settings.obsidianFolders[newKey] = d.settings.obsidianFolders[oldKey];
+        }
+        if (state.currentView === oldKey) state.currentView = newKey;
+      });
+      const importedTaskSubjectMigrations = { math:'math-analysis', physics:'physics-mech', cs:'cs-ics', ai:'research' };
+      state.tasks.forEach(task => {
+        if (!task.id) task.id = uid();
+        if (importedTaskSubjectMigrations[task.subject]) task.subject = importedTaskSubjectMigrations[task.subject];
+        if (!Array.isArray(task.steps)) task.steps = [];
+        task.steps = task.steps.map(step => typeof step === 'string'
+          ? { id:uid(), text:step, done:false }
+          : { id:step.id || uid(), text:step.text || '', done:!!step.done });
+      });
+      SUBJECT_KEYS.forEach(key => {
+        if (!state.notes[key]) state.notes[key] = {};
+        if (!state.subjectLinks[key]) state.subjectLinks[key] = { notebookLM:'' };
+        if (!state.settings.obsidianFolders[key]) state.settings.obsidianFolders[key] = '';
+      });
+      if (state.currentView !== 'tasks' && !SUBJECTS[state.currentView]) state.currentView = 'math-analysis';
       save(); applyBackground(); renderMusic(); updateObsidianLink(); renderAll();
       alert('导入成功！');
     } catch(err) { alert('导入失败：文件格式不正确'); }
@@ -824,14 +930,68 @@ function setupEvents() {
       if (!title) return;
       const detail = document.getElementById('task-detail-input').value.trim();
       const subject = document.getElementById('task-subject-select').value;
-      state.tasks.push({ id:uid(), title, detail, subject, date:today(), done:false });
+      const steps = document.getElementById('task-steps-input').value.split('\n')
+        .map(text => text.trim()).filter(Boolean)
+        .map(text => ({ id:uid(), text, done:false }));
+      state.tasks.push({ id:uid(), title, detail, subject, steps, date:today(), done:false });
       save(); renderAll();
+      return;
+    }
+    const stepToggle = e.target.closest('[data-task-step-toggle]');
+    if (stepToggle) {
+      const task = state.tasks[+stepToggle.dataset.taskStepToggle];
+      const step = task?.steps?.[+stepToggle.dataset.stepIdx];
+      if (step) { step.done = !step.done; save(); renderAll(); }
       return;
     }
     const tog = e.target.closest('[data-task-toggle]');
     if (tog) { const idx=+tog.dataset.taskToggle; state.tasks[idx].done=!state.tasks[idx].done; save(); renderAll(); return; }
+    const edit = e.target.closest('[data-task-edit]');
+    if (edit) {
+      editingTaskId = state.tasks[+edit.dataset.taskEdit]?.id || null;
+      renderTaskView();
+      document.querySelector('.task-card-edit')?.scrollIntoView({behavior:'smooth', block:'center'});
+      return;
+    }
+    if (e.target.closest('[data-task-cancel]')) { editingTaskId = null; renderTaskView(); return; }
+    const editStepToggle = e.target.closest('[data-edit-step-toggle]');
+    if (editStepToggle) {
+      const row = editStepToggle.closest('.task-edit-step');
+      const done = row.dataset.done !== 'true';
+      row.dataset.done = String(done);
+      editStepToggle.classList.toggle('checked', done);
+      editStepToggle.textContent = done ? '✓' : '';
+      return;
+    }
+    const editStepRemove = e.target.closest('[data-edit-step-remove]');
+    if (editStepRemove) { editStepRemove.closest('.task-edit-step')?.remove(); return; }
+    if (e.target.closest('[data-edit-step-add]')) {
+      const steps = e.target.closest('.task-edit-steps');
+      e.target.insertAdjacentHTML('beforebegin', taskStepEditRow());
+      steps.querySelector('.task-edit-step:last-of-type .task-edit-step-input')?.focus();
+      return;
+    }
+    const saveEdit = e.target.closest('[data-task-save]');
+    if (saveEdit) {
+      const idx = +saveEdit.dataset.taskSave;
+      const task = state.tasks[idx];
+      const card = saveEdit.closest('.task-card-edit');
+      const title = card.querySelector('.task-edit-title').value.trim();
+      if (!task || !title) { card.querySelector('.task-edit-title').focus(); return; }
+      task.title = title;
+      task.detail = card.querySelector('.task-edit-detail').value.trim();
+      task.subject = card.querySelector('.task-edit-subject').value;
+      task.steps = Array.from(card.querySelectorAll('.task-edit-step')).map(row => ({
+        id: row.dataset.stepId || uid(),
+        text: row.querySelector('.task-edit-step-input').value.trim(),
+        done: row.dataset.done === 'true'
+      })).filter(step => step.text);
+      editingTaskId = null;
+      save(); renderAll();
+      return;
+    }
     const del = e.target.closest('[data-task-del]');
-    if (del) { state.tasks.splice(+del.dataset.taskDel,1); save(); renderAll(); }
+    if (del) { state.tasks.splice(+del.dataset.taskDel,1); editingTaskId = null; save(); renderAll(); }
   });
 
   // Settings

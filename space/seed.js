@@ -9,9 +9,9 @@ const SEED_CONFIG = {
   musicIds: ["4949138"],
   subjectLinks: {
     "math-analysis": { notebookLM: "https://notebooklm.google.com/notebook/e9f55d74-ca28-4df5-9a42-cc149362c4b2" },
-    "math-linalg": { notebookLM: "https://notebooklm.google.com/notebook/85b7fdfe-d8b7-4f7b-a90f-134499d43f33" },
+    "math-ode": { notebookLM: "https://notebooklm.google.com/notebook/85b7fdfe-d8b7-4f7b-a90f-134499d43f33" },
     "physics-mech": { notebookLM: "https://notebooklm.google.com/notebook/e9f55d74-ca28-4df5-9a42-cc149362c4b2" },
-    "cs": { notebookLM: "https://notebooklm.google.com/notebook/2fc3274a-4750-43c3-9fd0-ca94c0f66166" }
+    "cs-ics": { notebookLM: "https://notebooklm.google.com/notebook/2fc3274a-4750-43c3-9fd0-ca94c0f66166" }
   },
   backgrounds: ["bg_seed_0", "bg_seed_1"],
   currentBg: 0
