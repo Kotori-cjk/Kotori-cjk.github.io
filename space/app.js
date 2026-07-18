@@ -150,8 +150,9 @@ function load() {
         if (taskSubjectMigrations[task.subject]) task.subject = taskSubjectMigrations[task.subject];
         if (!Array.isArray(task.steps)) task.steps = [];
         task.steps = task.steps.map(step => typeof step === 'string'
-          ? { id:uid(), text:step, done:false }
-          : { id:step.id || uid(), text:step.text || '', done:!!step.done });
+          ? { id:uid(), text:step, done:false, ddl:'' }
+          : { id:step.id || uid(), text:step.text || '', done:!!step.done, ddl:step.ddl || '' });
+        task.ddl = task.ddl || '';
       });
       if (state.currentView !== 'tasks' && !SUBJECTS[state.currentView]) state.currentView = 'math-analysis';
     }
@@ -533,10 +534,30 @@ function taskTagClass(subject) {
   return 'task-tag-general';
 }
 
-function taskStepEditRow(step={ id:'', text:'', done:false }) {
+function parseTaskStepLine(line, fallbackDdl='') {
+  const match = line.match(/^(.*?)\s+@\s*(\d{4}-\d{2}-\d{2})(?:[ T](\d{2}:\d{2}))?$/);
+  const text = (match ? match[1] : line).trim();
+  const ddl = match ? `${match[2]}T${match[3] || '23:59'}` : fallbackDdl;
+  return { id:uid(), text, done:false, ddl };
+}
+
+function ddlBadge(ddl, done=false) {
+  if (!ddl) return '';
+  const deadline = new Date(ddl);
+  if (Number.isNaN(deadline.getTime())) return '';
+  const diff = deadline.getTime() - Date.now();
+  let status = '';
+  if (!done && diff < 0) status = ' overdue';
+  else if (!done && diff <= 24 * 60 * 60 * 1000) status = ' soon';
+  const label = deadline.toLocaleString('zh-CN', {month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false});
+  return `<span class="task-ddl${status}" title="截止时间 ${escHtml(deadline.toLocaleString('zh-CN'))}">⏰ ${escHtml(label)}</span>`;
+}
+
+function taskStepEditRow(step={ id:'', text:'', done:false, ddl:'' }) {
   return `<div class="task-edit-step" data-step-id="${escHtml(step.id || uid())}" data-done="${step.done?'true':'false'}">
     <button type="button" class="task-step-check${step.done?' checked':''}" data-edit-step-toggle aria-label="切换子步骤状态">${step.done?'✓':''}</button>
     <input type="text" class="task-edit-step-input" value="${escHtml(step.text)}" placeholder="子步骤内容">
+    <input type="datetime-local" class="task-edit-step-ddl" value="${escHtml(step.ddl || '')}" aria-label="子步骤 DDL">
     <button type="button" class="task-step-remove" data-edit-step-remove aria-label="删除子步骤">✕</button>
   </div>`;
 }
@@ -554,7 +575,10 @@ function renderTaskView() {
     <div class="task-form">
       <input type="text" id="task-title-input" placeholder="任务标题">
       <textarea id="task-detail-input" placeholder="详情 (选填)"></textarea>
-      <textarea id="task-steps-input" class="task-steps-input" placeholder="子步骤（选填，每行一个）"></textarea>
+      <label class="task-field-label" for="task-ddl-input">⏰ DDL（有子步骤时会批量应用）</label>
+      <input type="datetime-local" id="task-ddl-input">
+      <textarea id="task-steps-input" class="task-steps-input" placeholder="子步骤（选填，每行一个）\n可单独指定：整理例题 @ 2026-07-20 23:00"></textarea>
+      <p class="task-form-hint">有子步骤时，DDL 归属于各子步骤；没有子步骤时，DDL 归属于总任务。</p>
       <div class="task-form-bottom">
         <select id="task-subject-select">
           ${taskSubjectOptions()}
@@ -587,8 +611,10 @@ function renderTaskView() {
             <input type="text" class="task-edit-title" value="${escHtml(t.title)}" placeholder="任务标题">
             <textarea class="task-edit-detail" placeholder="详情（选填）">${escHtml(t.detail || '')}</textarea>
             <select class="task-edit-subject">${taskSubjectOptions(t.subject)}</select>
+            <label class="task-field-label">⏰ 总任务 DDL（仅无子步骤时使用）</label>
+            <input type="datetime-local" class="task-edit-ddl" value="${escHtml(t.ddl || '')}">
             <div class="task-edit-steps">
-              <div class="task-edit-steps-label">子步骤</div>
+              <div class="task-edit-steps-label">子步骤与各自 DDL</div>
               ${steps.map(taskStepEditRow).join('')}
               <button type="button" class="task-add-step" data-edit-step-add>＋ 添加子步骤</button>
             </div>
@@ -609,10 +635,11 @@ function renderTaskView() {
           ${steps.length ? `<div class="task-steps">
             ${steps.map((step,stepIdx) => `<div class="task-step${step.done?' done':''}">
               <button class="task-step-check${step.done?' checked':''}" data-task-step-toggle="${t._idx}" data-step-idx="${stepIdx}" aria-label="切换子步骤状态">${step.done?'✓':''}</button>
-              <span>${escHtml(step.text)}</span>
+              <span class="task-step-text">${escHtml(step.text)}</span>
+              ${ddlBadge(step.ddl, step.done)}
             </div>`).join('')}
           </div>` : ''}
-          <div class="task-meta"><span class="task-tag ${tagCls}">${tagName}</span>${steps.length ? `<span class="task-progress">${completedSteps}/${steps.length} 子步骤</span>` : ''}</div>
+          <div class="task-meta"><span class="task-tag ${tagCls}">${tagName}</span>${steps.length ? `<span class="task-progress">${completedSteps}/${steps.length} 子步骤</span>` : ddlBadge(t.ddl, t.done)}</div>
         </div>
         <div class="task-actions">
           <button class="task-edit" data-task-edit="${t._idx}">编辑</button>
@@ -737,8 +764,9 @@ async function importData(file) {
         if (importedTaskSubjectMigrations[task.subject]) task.subject = importedTaskSubjectMigrations[task.subject];
         if (!Array.isArray(task.steps)) task.steps = [];
         task.steps = task.steps.map(step => typeof step === 'string'
-          ? { id:uid(), text:step, done:false }
-          : { id:step.id || uid(), text:step.text || '', done:!!step.done });
+          ? { id:uid(), text:step, done:false, ddl:'' }
+          : { id:step.id || uid(), text:step.text || '', done:!!step.done, ddl:step.ddl || '' });
+        task.ddl = task.ddl || '';
       });
       SUBJECT_KEYS.forEach(key => {
         if (!state.notes[key]) state.notes[key] = {};
@@ -930,10 +958,11 @@ function setupEvents() {
       if (!title) return;
       const detail = document.getElementById('task-detail-input').value.trim();
       const subject = document.getElementById('task-subject-select').value;
+      const ddl = document.getElementById('task-ddl-input').value;
       const steps = document.getElementById('task-steps-input').value.split('\n')
         .map(text => text.trim()).filter(Boolean)
-        .map(text => ({ id:uid(), text, done:false }));
-      state.tasks.push({ id:uid(), title, detail, subject, steps, date:today(), done:false });
+        .map(text => parseTaskStepLine(text, ddl));
+      state.tasks.push({ id:uid(), title, detail, subject, steps, ddl:steps.length ? '' : ddl, date:today(), done:false });
       save(); renderAll();
       return;
     }
@@ -967,7 +996,9 @@ function setupEvents() {
     if (editStepRemove) { editStepRemove.closest('.task-edit-step')?.remove(); return; }
     if (e.target.closest('[data-edit-step-add]')) {
       const steps = e.target.closest('.task-edit-steps');
-      e.target.insertAdjacentHTML('beforebegin', taskStepEditRow());
+      const hasSteps = steps.querySelector('.task-edit-step');
+      const fallbackDdl = hasSteps ? '' : e.target.closest('.task-card-edit').querySelector('.task-edit-ddl').value;
+      e.target.insertAdjacentHTML('beforebegin', taskStepEditRow({ ddl:fallbackDdl }));
       steps.querySelector('.task-edit-step:last-of-type .task-edit-step-input')?.focus();
       return;
     }
@@ -984,8 +1015,10 @@ function setupEvents() {
       task.steps = Array.from(card.querySelectorAll('.task-edit-step')).map(row => ({
         id: row.dataset.stepId || uid(),
         text: row.querySelector('.task-edit-step-input').value.trim(),
-        done: row.dataset.done === 'true'
+        done: row.dataset.done === 'true',
+        ddl: row.querySelector('.task-edit-step-ddl').value
       })).filter(step => step.text);
+      task.ddl = task.steps.length ? '' : card.querySelector('.task-edit-ddl').value;
       editingTaskId = null;
       save(); renderAll();
       return;
