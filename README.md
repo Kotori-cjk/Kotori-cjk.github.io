@@ -1,40 +1,28 @@
-# Kotori's Colorful Seika
+# Kotori's Homepage
 
-Kotori's Colorful Seika 是我的个人学习主页，也是一个轻量的浏览器端学习工作台。它把课程笔记、每日待办、Obsidian / NotebookLM 外链、音乐与背景设置集中在一个柔和可爱的单页应用里，方便我把每天的学习记录沉淀下来。
+这是 `Kotori-cjk.github.io` 的公开个人主页仓库。
 
 在线访问：[https://kotori-cjk.github.io/](https://kotori-cjk.github.io/)
 
-## 站点内容
+## 定位
 
-- 学科笔记：按数学、物理、程设、AI 引论等方向组织 Markdown 笔记(也支持latex渲染)。
-- 今日待办：记录当天任务、完成状态和任务类别。
-- 外部工作流：支持跳转 Obsidian、NotebookLM、Bangumi 等常用页面。
-- Code Analysis：跳转到洛谷刷题与 AI 代码分析站，用于保存题目、代码、AI 诊断和问答记录。
-- 思政背诵：包含史纲与思修两个栏目，提供章节背诵、抽认卡、填空、无限刷题、模拟考试和分科错题复习。
-- AI 背诵：整理 AI 引论概念辨析、计算公式、建模模板和高频判断纠偏。
-- 个性化设置：支持自定义背景图、网易云音乐、JSON 数据导入导出。
+- Homepage 对外公开，展示个人介绍、公开链接、背景与音乐。
+- 后续 Blog 将与 Homepage 一起保持公开，并可随主站绑定独立 `.com` 域名。
+- 学习工作台 Colorful Seika 已拆分到独立的 `space` 仓库，并继续使用 `/space/` 项目站路径。
+- 算法、Code Analysis、思政背诵等内部站点仍需经过密码入口。
 
-## 相关子站
+## 站点边界
 
-- Code Analysis：[https://kotori-cjk.github.io/luogu-ai-journey/](https://kotori-cjk.github.io/luogu-ai-journey/)
+- Homepage：[https://kotori-cjk.github.io/](https://kotori-cjk.github.io/)
+- Colorful Seika：[https://kotori-cjk.github.io/space/](https://kotori-cjk.github.io/space/)
 - Luogu Journey：[https://kotori-cjk.github.io/luogu-journey/](https://kotori-cjk.github.io/luogu-journey/)
-- 思政背诵：[https://kotori-cjk.github.io/politics-recite/](https://kotori-cjk.github.io/politics-recite/)
-- AI 背诵：[https://kotori-cjk.github.io/ai-recite/](https://kotori-cjk.github.io/ai-recite/)
+- Code Analysis：[https://kotori-cjk.github.io/luogu-ai-journey/](https://kotori-cjk.github.io/luogu-ai-journey/)
+- 思政背诵：[https://kotori-cjk.github.io/space/politics-recite/](https://kotori-cjk.github.io/space/politics-recite/)
 
 ## 技术栈
 
-这个站点保持为纯前端静态站点，便于直接部署在 GitHub Pages 上：
+纯静态 HTML、CSS 与 Vanilla JavaScript，可直接部署到 GitHub Pages。
 
-- HTML
-- CSS
-- Vanilla JavaScript
-- LocalStorage
-- Markdown rendering via `marked`
+## 未来绑定 `.com`
 
-## 数据说明
-
-站点数据默认保存在浏览器 `localStorage` 中，不依赖后端服务。设置面板提供 JSON 导入和导出功能，方便迁移、备份或恢复学习记录。
-
-## 设计方向
-
-整体视觉延续粉色系、柔和、轻量的学习空间风格。它不是一个严肃的管理后台，而更像一张可以长期陪伴学习的个人桌面。
+Homepage 绑定自定义域名后，保持 `homepage.js` 中的 `SPACE_URL` 指向 `https://kotori-cjk.github.io/space/`。Space 会在跨域情况下显示自己的密码入口，因此 Homepage 与 Blog 可以公开，而学习站和其余子站仍保持受保护。

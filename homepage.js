@@ -1,6 +1,7 @@
 ﻿const SEIKA_KEY = 'kotori-seika-v1';
 const AUTH_KEY = 'kotori-space-auth';
 const SPACE_PASSWORD = 'Favorite';
+const SPACE_URL = 'https://kotori-cjk.github.io/space/';
 const IDB_NAME = 'kotori-seika-images';
 const IDB_STORE = 'images';
 
@@ -242,7 +243,7 @@ async function enterSpace() {
   if (input.value === SPACE_PASSWORD) {
     sessionStorage.setItem(AUTH_KEY, 'ok');
     localStorage.setItem(AUTH_KEY, 'ok');
-    window.location.href = 'space/';
+    window.location.href = SPACE_URL;
     return;
   }
   hint.textContent = '密码不正确。';
