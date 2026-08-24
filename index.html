@@ -1,129 +1,115 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Kotori 的公开个人主页、兴趣画册与私人学习空间入口。">
     <title>Kotori's Homepage</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@500;700&family=Noto+Sans+SC:wght@300;400;500;700&family=Yusei+Magic&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="homepage.css">
 </head>
-<body>
-    <div id="bg-layer"></div>
-    <div id="ambient-layer" aria-hidden="true"></div>
+<body class="cover-closed">
+    <div id="bg-layer" aria-hidden="true"></div>
+    <div class="paper-noise" aria-hidden="true"></div>
 
-    <main class="home-shell">
-        <header class="topbar">
-            <div>
-                <p class="eyebrow">Kotori's personal gate</p>
-                <h1>Kotori's Homepage</h1>
+    <section id="book-intro" class="book-intro" aria-label="打开 Kotori 的画册">
+        <div class="intro-frame intro-frame-left" aria-hidden="true"><span>ことり</span></div>
+        <div class="book-stage">
+            <div id="intro-book" class="intro-book">
+                <div class="book-page cover-page" data-density="hard">
+                    <div id="cover-art" class="cover-art"></div>
+                    <div class="cover-wash"></div>
+                    <div class="cover-copy">
+                        <small>Kotori's private album</small>
+                        <strong>Colorful<br>Seika</strong>
+                        <em>そして始まる、きみとはぐ、のセカイ!</em>
+                    </div>
+                    <div class="cover-hint">点击翻开 · Enter 打开</div>
+                </div>
+                <div class="book-page inside-page">
+                    <span class="inside-flower">桜</span>
+                    <small>WELCOME TO</small>
+                    <strong>Kotori's Homepage</strong>
+                    <p>ACGN · Science Fiction · Music · Study</p>
+                </div>
             </div>
-            <div class="top-actions">
-                <button id="bg-view-btn" class="icon-btn" title="观赏背景" aria-label="观赏背景">🖼</button>
-                <button id="settings-btn" class="icon-btn" title="背景与音乐设置" aria-label="背景与音乐设置">⚙</button>
-            </div>
+            <button id="open-book-btn" class="open-book-overlay" type="button" aria-label="打开 Kotori 的 Homepage"></button>
+        </div>
+        <div class="intro-frame intro-frame-right" aria-hidden="true"><span>彩りの日々</span></div>
+    </section>
+
+    <main id="homepage" class="homepage" aria-hidden="true">
+        <header class="topbar reveal-section" data-reveal="down">
+            <a class="wordmark" href="#top" aria-label="回到顶部"><span>K</span><div><small>Kotori's</small><strong>Homepage</strong></div></a>
+            <nav class="topnav" aria-label="页面导航">
+                <a href="#about">About</a><a href="#interests">Interests</a><a href="#music">Music</a>
+                <button id="settings-btn" type="button">设置</button>
+            </nav>
         </header>
 
-        <section class="hero-grid">
-            <div class="profile-panel">
-                <div class="profile-heading">
-                    <span class="profile-mark">ことり</span>
-                </div>
-                <article id="profile-rendered" class="profile-content"></article>
+        <section id="top" class="hero-section">
+            <div class="hero-copy reveal-section" data-reveal="left">
+                <p class="eyebrow">こんにちは、Kotoriです~</p>
+                <h1>把喜欢的事物，<br><span>收进一册柔软的日常。</span></h1>
+                <p class="hero-lead">ACGN、科学幻想、音乐与学习。这里是公开的自我介绍页，也是一扇通往私人学习空间的门。</p>
+                <div class="hero-actions"><a class="primary-link" href="#about">翻阅画册</a><button id="enter-space-btn" class="secondary-link" type="button">进入学习空间</button></div>
             </div>
-
-            <aside class="gate-panel">
-                <img class="gate-logo" src="assets/colorful-seika-logo.png" alt="Kotori's Colorful Seika logo">
-                <div class="gate-copy">
-                    <div class="seal">Colorful Seika</div>
-                    <h2>Kotori's Colorful Seika</h2>
-                    <p>学习笔记、任务、学科整理和内部入口都在这里。</p>
-                </div>
-                <button id="enter-space-btn" class="primary-btn">Enter the Colorful Seika</button>
-                <div id="locked-message" class="locked-message" hidden>请先从 Homepage 输入口令进入主站。</div>
-            </aside>
+            <div class="hero-collage reveal-section" data-reveal="right" aria-label="Kotori 的画册拼贴">
+                <figure class="photo-card photo-main"><img src="assets/book-cover-cherry.webp" alt="Alice Bailly 的樱花水彩画"><figcaption>Cherry blossom · Alice Bailly</figcaption></figure>
+                <div class="sticker sticker-pink">ことり</div><div class="sticker sticker-note">Colorful<br>Journey</div>
+                <div class="tape tape-one" aria-hidden="true"></div><div class="tape tape-two" aria-hidden="true"></div>
+            </div>
         </section>
 
-        <section class="link-strip" aria-label="外部链接">
-            <a id="link-bangumi" class="link-card" target="_blank" rel="noreferrer" aria-label="Bangumi">
-                <span class="link-icon">番</span>
-                <strong>Bangumi</strong>
-            </a>
-            <a id="link-github" class="link-card" target="_blank" rel="noreferrer" aria-label="GitHub">
-                <span class="link-icon github-icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" role="img"><path d="M12 .5A11.5 11.5 0 0 0 8.36 22.9c.58.11.79-.25.79-.56v-2.02c-3.22.7-3.9-1.39-3.9-1.39-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.71.08-.71 1.16.08 1.77 1.2 1.77 1.2 1.04 1.77 2.72 1.26 3.38.96.11-.75.41-1.26.74-1.55-2.57-.29-5.27-1.28-5.27-5.72 0-1.26.45-2.3 1.19-3.11-.12-.29-.52-1.47.11-3.06 0 0 .97-.31 3.17 1.19A10.98 10.98 0 0 1 12 6.04c.98 0 1.96.13 2.88.39 2.2-1.5 3.17-1.19 3.17-1.19.63 1.59.23 2.77.11 3.06.74.81 1.19 1.85 1.19 3.11 0 4.45-2.71 5.42-5.29 5.71.42.36.79 1.07.79 2.16v3.06c0 .31.21.68.8.56A11.5 11.5 0 0 0 12 .5Z"/></svg>
-                </span>
-                <strong>GitHub</strong>
-            </a>
-            <a id="link-x" class="link-card" target="_blank" rel="noreferrer" aria-label="X">
-                <span class="link-icon">𝕏</span>
-                <strong>X</strong>
-            </a>
-            <a id="link-email" class="link-card" aria-label="QQ Mail">
-                <span class="link-icon">✉</span>
-                <strong>QQ Mail</strong>
-            </a>
+        <section id="about" class="album-section about-section reveal-section" data-reveal="up">
+            <div class="section-heading"><span>01</span><div><small>A little introduction</small><h2>关于 Kotori</h2></div></div>
+            <div class="about-grid">
+                <article class="paper-card profile-note"><p class="large-handwriting">そして始まる、<br>きみとはぐ、のセカイ!</p><p>我喜欢带有细腻世界观的作品，也喜欢把学习过程整理成可重复使用的工具。这个 Homepage 对外开放；学习笔记、任务与分析工具则收在私人 Space 中。</p></article>
+                <article class="paper-card gate-card"><img src="assets/colorful-seika-logo.png" alt="Colorful Seika logo"><div><small>PRIVATE STUDY ROOM</small><h3>Kotori's Colorful Seika</h3><p>概率论、常微分方程、理力、普物、ICS、数算、科研与算法分析。</p><button id="gate-space-btn" type="button">输入密码进入</button></div></article>
+            </div>
         </section>
 
-        <section class="music-dock">
-            <div class="section-title">Music</div>
-            <div id="music-container" class="music-container"></div>
+        <section id="interests" class="album-section interests-section">
+            <div class="section-heading reveal-section" data-reveal="left"><span>02</span><div><small>Things I keep returning to</small><h2>兴趣切片</h2></div></div>
+            <div id="interest-grid" class="interest-grid"></div>
         </section>
+
+        <section class="album-section links-section reveal-section" data-reveal="up">
+            <div class="section-heading compact-heading"><span>03</span><div><small>Find me elsewhere</small><h2>外部链接</h2></div></div>
+            <div id="external-links" class="external-links"></div>
+        </section>
+
+        <section id="music" class="album-section music-section">
+            <div class="section-heading reveal-section" data-reveal="right"><span>04</span><div><small>Soundtrack for slow afternoons</small><h2>唱片页</h2></div></div>
+            <div id="music-container" class="music-grid reveal-section" data-reveal="up"></div>
+        </section>
+
+        <footer class="footer reveal-section" data-reveal="up"><span>Made as a small personal album.</span><button id="reopen-cover-btn" type="button">重新合上画册</button></footer>
     </main>
 
-    <div id="password-modal" class="modal" aria-hidden="true">
-        <div class="modal-overlay"></div>
-        <div class="modal-content small-modal">
-            <div class="modal-header">
-                <h2>进入 Kotori's Colorful Seika</h2>
-                <button class="modal-close" data-close-password aria-label="关闭">×</button>
-            </div>
-            <div class="modal-body">
-                <input id="space-password-input" class="text-input" type="password" placeholder="Password" autocomplete="current-password">
-                <button id="password-submit-btn" class="primary-btn full">确认进入</button>
-                <p id="password-hint" class="form-hint"></p>
-            </div>
-        </div>
-    </div>
+    <dialog id="space-dialog" class="site-dialog">
+        <form id="space-login-form" method="post">
+            <button class="dialog-close" type="button" data-close-dialog aria-label="关闭">×</button>
+            <p class="dialog-kicker">PRIVATE STUDY ROOM</p><h2>进入 Colorful Seika</h2>
+            <p>密码会通过 HTTPS 发送到 Space 的服务端验证，不会保存在 Homepage 源码中。</p>
+            <input name="password" type="password" placeholder="Password" autocomplete="current-password" required><input name="next" type="hidden" value="/">
+            <button class="dialog-submit" type="submit">确认进入</button>
+        </form>
+    </dialog>
 
-    <div id="settings-modal" class="modal" aria-hidden="true">
-        <div class="modal-overlay"></div>
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>背景与音乐设置</h2>
-                <button class="modal-close" data-close-settings aria-label="关闭">×</button>
-            </div>
-            <div class="modal-body settings-layout">
-                <section class="settings-block wide">
-                    <h3>背景图片</h3>
-                    <div class="inline-row">
-                        <input type="file" id="bg-upload" accept="image/*" multiple hidden>
-                        <button id="bg-upload-btn" class="soft-btn">上传图片</button>
-                        <button id="bg-reset-btn" class="soft-btn">默认背景</button>
-                    </div>
-                    <div id="bg-preview-list" class="bg-preview-list"></div>
-                </section>
+    <dialog id="settings-dialog" class="site-dialog settings-dialog">
+        <form method="dialog">
+            <button class="dialog-close" value="cancel" aria-label="关闭">×</button><p class="dialog-kicker">PERSONALIZE THE ALBUM</p><h2>画册设置</h2>
+            <section class="setting-block"><h3>封面图片</h3><p>封面与背景分别保存。上传后仍可恢复默认樱花水彩。</p><div class="setting-actions"><input id="cover-upload" type="file" accept="image/*" hidden><button id="cover-upload-btn" type="button">上传封面</button><button id="cover-reset-btn" type="button">恢复默认</button></div><div id="cover-preview" class="cover-preview"></div></section>
+            <section class="setting-block"><h3>页面背景</h3><div class="setting-actions"><input id="bg-upload" type="file" accept="image/*" multiple hidden><button id="bg-upload-btn" type="button">上传背景</button><button id="bg-reset-btn" type="button">使用纸张背景</button></div><div id="bg-preview-list" class="bg-preview-list"></div></section>
+            <section class="setting-block"><h3>网易云音乐</h3><div class="music-add-row"><input id="music-input" type="text" placeholder="歌曲链接或 ID"><button id="music-add-btn" type="button">添加</button></div><div id="music-manage-list" class="music-manage-list"></div></section>
+            <section class="setting-block"><h3>迁移与备份</h3><p>导出文件包含封面、背景和音乐设置，可在 pages.dev 或未来私人域名中恢复。</p><div class="setting-actions"><button id="export-home-btn" type="button">导出 Homepage</button><input id="import-home-file" type="file" accept="application/json,.json" hidden><button id="import-home-btn" type="button">导入 Homepage</button></div></section>
+        </form>
+    </dialog>
 
-                <section class="settings-block wide">
-                    <h3>网易云音乐</h3>
-                    <div class="inline-row stretch-row">
-                        <input id="music-input" class="text-input" type="text" placeholder="歌曲链接或 ID">
-                        <button id="music-add-btn" class="soft-btn">添加</button>
-                    </div>
-                    <div id="music-manage-list" class="music-manage-list"></div>
-                </section>
-            </div>
-        </div>
-    </div>
-
-    <button class="bg-view-exit" id="bg-view-exit">退出观赏</button>
-    <script src="homepage.js?v=20260708-fit2"></script>
+    <script src="vendor/st-page-flip/page-flip.browser.js"></script>
+    <script type="module" src="scripts/homepage.js"></script>
 </body>
 </html>
-
-
-
-
-
-

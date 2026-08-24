@@ -1,28 +1,17 @@
-# Kotori's Homepage
+# Kotori Homepage
 
-这是 `Kotori-cjk.github.io` 的公开个人主页仓库。
+公开的个人 Homepage。页面以日系画册为视觉方向，刷新时先展示可翻开的封面，正文包含自我介绍、兴趣、外部链接、私人学习空间入口和轻量网易云唱片卡片。
 
-在线访问：[https://kotori-cjk.github.io/](https://kotori-cjk.github.io/)
+## 本地预览
 
-## 定位
+```powershell
+python -m http.server 8000
+```
 
-- Homepage 对外公开，展示个人介绍、公开链接、背景与音乐。
-- 后续 Blog 将与 Homepage 一起保持公开，并可随主站绑定独立 `.com` 域名。
-- 学习工作台 Colorful Seika 已拆分到独立的 `space` 仓库，并继续使用 `/space/` 项目站路径。
-- 算法、Code Analysis、思政背诵等内部站点仍需经过密码入口。
+打开 <http://localhost:8000/>。本站不保存也不校验 Space 密码；密码表单直接提交给 Space 的服务端鉴权接口。
 
-## 站点边界
+## 配置与数据
 
-- Homepage：[https://kotori-cjk.github.io/](https://kotori-cjk.github.io/)
-- Colorful Seika：[https://kotori-cjk.github.io/space/](https://kotori-cjk.github.io/space/)
-- Luogu Journey：[https://kotori-cjk.github.io/luogu-journey/](https://kotori-cjk.github.io/luogu-journey/)
-- Code Analysis：[https://kotori-cjk.github.io/luogu-ai-journey/](https://kotori-cjk.github.io/luogu-ai-journey/)
-- 思政背诵：[https://kotori-cjk.github.io/space/politics-recite/](https://kotori-cjk.github.io/space/politics-recite/)
-
-## 技术栈
-
-纯静态 HTML、CSS 与 Vanilla JavaScript，可直接部署到 GitHub Pages。
-
-## 未来绑定 `.com`
-
-Homepage 绑定自定义域名后，保持 `homepage.js` 中的 `SPACE_URL` 指向 `https://kotori-cjk.github.io/space/`。Space 会在跨域情况下显示自己的密码入口，因此 Homepage 与 Blog 可以公开，而学习站和其余子站仍保持受保护。
+- 站点地址集中在 `site-config.js`。
+- 自定义封面、背景和音乐保存在浏览器本地，并可从设置面板完整导入导出。
+- 开源图片和动画许可记录在 `assets/ATTRIBUTION.md` 与 `vendor/st-page-flip/LICENSE`。
