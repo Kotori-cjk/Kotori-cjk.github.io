@@ -91,22 +91,15 @@ function openDialog(dialog) {
 }
 
 function setupDialogs() {
-  const spaceDialog = document.getElementById('space-dialog');
   const settingsDialog = document.getElementById('settings-dialog');
-  const openSpace = () => {
-    openDialog(spaceDialog);
-    window.setTimeout(() => spaceDialog.querySelector('input[name="password"]').focus(), 0);
-  };
+  const openSpace = () => { window.location.href = SITE_CONFIG.spaceUrl; };
   document.getElementById('enter-space-btn').addEventListener('click', openSpace);
   document.getElementById('gate-space-btn').addEventListener('click', openSpace);
   document.getElementById('settings-btn').addEventListener('click', () => openDialog(settingsDialog));
   document.querySelectorAll('[data-close-dialog]').forEach(button => button.addEventListener('click', () => button.closest('dialog').close()));
-  [spaceDialog, settingsDialog].forEach(dialog => dialog.addEventListener('click', event => {
+  [settingsDialog].forEach(dialog => dialog.addEventListener('click', event => {
     if (event.target === dialog) dialog.close();
   }));
-
-  const loginForm = document.getElementById('space-login-form');
-  loginForm.action = new URL('auth/login', SITE_CONFIG.spaceUrl).href;
 }
 
 function setupCoverSettings() {

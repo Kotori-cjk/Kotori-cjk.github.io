@@ -8,7 +8,7 @@
 python -m http.server 8000
 ```
 
-打开 <http://localhost:8000/>。本站不保存也不校验 Space 密码；密码表单直接提交给 Space 的服务端鉴权接口。
+打开 <http://localhost:8000/>。当前入口直接跳转到 GitHub Pages 上的 Space。
 
 ## 配置与数据
 

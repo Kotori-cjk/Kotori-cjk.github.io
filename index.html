@@ -88,23 +88,13 @@
         <footer class="footer reveal-section" data-reveal="up"><span>Made as a small personal album.</span><button id="reopen-cover-btn" type="button">重新合上画册</button></footer>
     </main>
 
-    <dialog id="space-dialog" class="site-dialog">
-        <form id="space-login-form" method="post">
-            <button class="dialog-close" type="button" data-close-dialog aria-label="关闭">×</button>
-            <p class="dialog-kicker">PRIVATE STUDY ROOM</p><h2>进入 Colorful Seika</h2>
-            <p>密码会通过 HTTPS 发送到 Space 的服务端验证，不会保存在 Homepage 源码中。</p>
-            <input name="password" type="password" placeholder="Password" autocomplete="current-password" required><input name="next" type="hidden" value="/">
-            <button class="dialog-submit" type="submit">确认进入</button>
-        </form>
-    </dialog>
-
     <dialog id="settings-dialog" class="site-dialog settings-dialog">
         <form method="dialog">
             <button class="dialog-close" value="cancel" aria-label="关闭">×</button><p class="dialog-kicker">PERSONALIZE THE ALBUM</p><h2>画册设置</h2>
             <section class="setting-block"><h3>封面图片</h3><p>封面与背景分别保存。上传后仍可恢复默认樱花水彩。</p><div class="setting-actions"><input id="cover-upload" type="file" accept="image/*" hidden><button id="cover-upload-btn" type="button">上传封面</button><button id="cover-reset-btn" type="button">恢复默认</button></div><div id="cover-preview" class="cover-preview"></div></section>
             <section class="setting-block"><h3>页面背景</h3><div class="setting-actions"><input id="bg-upload" type="file" accept="image/*" multiple hidden><button id="bg-upload-btn" type="button">上传背景</button><button id="bg-reset-btn" type="button">使用纸张背景</button></div><div id="bg-preview-list" class="bg-preview-list"></div></section>
             <section class="setting-block"><h3>网易云音乐</h3><div class="music-add-row"><input id="music-input" type="text" placeholder="歌曲链接或 ID"><button id="music-add-btn" type="button">添加</button></div><div id="music-manage-list" class="music-manage-list"></div></section>
-            <section class="setting-block"><h3>迁移与备份</h3><p>导出文件包含封面、背景和音乐设置，可在 pages.dev 或未来私人域名中恢复。</p><div class="setting-actions"><button id="export-home-btn" type="button">导出 Homepage</button><input id="import-home-file" type="file" accept="application/json,.json" hidden><button id="import-home-btn" type="button">导入 Homepage</button></div></section>
+            <section class="setting-block"><h3>迁移与备份</h3><p>导出文件包含封面、背景和音乐设置，可在 GitHub Pages 或未来私人域名中恢复。</p><div class="setting-actions"><button id="export-home-btn" type="button">导出 Homepage</button><input id="import-home-file" type="file" accept="application/json,.json" hidden><button id="import-home-btn" type="button">导入 Homepage</button></div></section>
         </form>
     </dialog>
 
