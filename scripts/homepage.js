@@ -115,8 +115,10 @@ async function init() {
   const [site, projects, music, posts] = await Promise.all([loadJson('content/site.json', {}), loadJson('content/projects.json', []), loadJson('content/music.json', []), loadJson('content/posts.json', [])]);
   publicSite = site; renderPublicContent(site, projects, posts);
   await initStorage(); applyCover(); applyBackground(); renderBackgrounds(); initPlayer(music);
-  setupDialogs(); setupCoverSettings(); setupBackgroundSettings(); setupBackup(); initRippleEffects(); initRevealMotion(); initBookIntro({ onOpen: () => window.scrollTo({ top: 0 }) });
+  setupDialogs(); setupCoverSettings(); setupBackgroundSettings(); setupBackup(); initRevealMotion();
   document.getElementById('reopen-cover-btn').addEventListener('click', () => window.location.reload());
 }
 
+initRippleEffects();
+initBookIntro({ onOpen: () => window.scrollTo({ top: 0 }) });
 init().catch(error => { console.error(error); document.body.classList.remove('cover-closed'); document.body.classList.add('book-open'); });
