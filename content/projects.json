@@ -37,5 +37,17 @@
     "cover": "assets/uploads/1788017905646-83428525-p0-081c1837.webp",
     "order": 3,
     "visible": true
+  },
+  {
+    "id": "project-1788021714637",
+    "title": "HomePageEditor",
+    "description": "A local, safe-demo content editor for static personal homepages",
+    "url": "https://github.com/Kotori-cjk/HomePageEditor",
+    "tags": [
+      "website editor"
+    ],
+    "cover": "assets/uploads/1788022010718-100230297-p0-9e103be8.webp",
+    "order": 4,
+    "visible": true
   }
 ]
