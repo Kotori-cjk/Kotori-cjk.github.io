@@ -6,11 +6,11 @@
 
 ```powershell
 npm install --cache .npm-cache
-npm run build
+npm run build:local
 python -m http.server 8000 -d dist
 ```
 
-打开 <http://localhost:8000/>。源文件不会直接发布；GitHub Actions 会构建 `dist/` 并部署到 GitHub Pages。
+打开 <http://localhost:8000/>。本地编辑器位于 <http://localhost:8000/editor/>。线上 GitHub Actions 使用 `npm run build`，不会把编辑器或编辑器入口部署到公开网站。
 
 ## 公开内容
 
@@ -20,7 +20,7 @@ python -m http.server 8000 -d dist
 - `content/posts/*.md`：博客 Markdown；`draft: true` 不会公开。
 - `assets/uploads/`：编辑器上传并压缩后的公共素材。
 
-所有公开内容均可通过本地或线上 `/editor/` 管理。编辑器草稿保存在 IndexedDB；发布时需要每次粘贴一个仅授权 `Kotori-cjk/Kotori-cjk.github.io`、具有 `Contents: read/write` 的 fine-grained token。令牌只存在页面内存，不写入浏览器存储、URL、日志或仓库。
+所有公开内容均通过本地 `/editor/` 管理。编辑器草稿保存在 IndexedDB；发布时需要每次粘贴一个仅授权 `Kotori-cjk/Kotori-cjk.github.io`、具有 `Contents: read/write` 的 fine-grained token。令牌只存在页面内存，不写入浏览器存储、URL、日志或仓库。
 
 发布前编辑器会检查远程 `main` 是否变化，并通过 Git blobs/trees/commits/refs API 将全部修改作为一个 commit 写入。远程分支变化时会拒绝覆盖。
 

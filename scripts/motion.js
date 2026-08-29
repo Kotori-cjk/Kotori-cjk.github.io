@@ -45,12 +45,16 @@ export function initBookIntro({ onOpen }) {
       document.getElementById('homepage').setAttribute('aria-hidden', 'false');
       onOpen?.();
     };
-    window.setTimeout(finish, reduced ? 80 : 900);
+    window.setTimeout(finish, reduced ? 80 : (pageFlip ? 1180 : 180));
     try { pageFlip?.flipNext('top'); }
     catch (error) { console.warn('Page flip animation skipped:', error); }
   };
 
-  stage.addEventListener('click', open, { capture: true });
+  stage.addEventListener('click', event => {
+    event.preventDefault();
+    event.stopPropagation();
+    open();
+  }, { capture: true });
   button.addEventListener('click', open);
   document.addEventListener('keydown', event => {
     if (!opened && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); open(); }

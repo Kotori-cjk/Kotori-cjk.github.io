@@ -6,6 +6,7 @@ import MarkdownIt from 'markdown-it';
 const ROOT = process.cwd();
 const DIST = path.join(ROOT, 'dist');
 const POSTS_DIR = path.join(ROOT, 'content', 'posts');
+const INCLUDE_EDITOR = process.argv.includes('--include-editor');
 const markdown = new MarkdownIt({ html: false, linkify: true, typographer: true });
 
 const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({
@@ -110,10 +111,13 @@ async function build() {
   await rm(DIST, { recursive: true, force: true });
   await mkdir(DIST, { recursive: true });
   for (const item of ['index.html', 'homepage.css', 'blog.css', 'site-config.js', 'README.md']) await copyIfExists(item);
-  for (const item of ['assets', 'vendor', 'scripts', 'editor', 'politics-recite', 'ai-recite']) await copyIfExists(item);
+  for (const item of ['assets', 'vendor', 'scripts', 'politics-recite', 'ai-recite']) await copyIfExists(item);
   await mkdir(path.join(DIST, 'content'), { recursive: true });
   for (const item of ['site.json', 'projects.json', 'music.json']) await copyIfExists(`content/${item}`);
-  await copyIfExists('node_modules/markdown-it/dist/markdown-it.min.js', 'vendor/markdown-it.min.js');
+  if (INCLUDE_EDITOR) {
+    await copyIfExists('editor');
+    await copyIfExists('node_modules/markdown-it/dist/markdown-it.min.js', 'vendor/markdown-it.min.js');
+  }
   await writeFile(path.join(DIST, '.nojekyll'), '');
   await buildPosts();
 }
