@@ -58,7 +58,7 @@
     {
       "id": "bangumi",
       "label": "Bangumi",
-      "note": "动画与书影音记录",
+      "note": "ACGN interests",
       "href": "https://bangumi.tv/user/1151382",
       "icon": "bangumi",
       "visible": true
@@ -66,7 +66,7 @@
     {
       "id": "github",
       "label": "GitHub",
-      "note": "代码与小工具",
+      "note": "code & projects",
       "href": "https://github.com/Kotori-cjk",
       "icon": "github",
       "visible": true
@@ -74,7 +74,7 @@
     {
       "id": "x",
       "label": "X",
-      "note": "偶尔出现的碎片",
+      "note": "social media",
       "href": "https://x.com/KotoriMare",
       "icon": "x",
       "visible": true
@@ -82,14 +82,14 @@
     {
       "id": "email",
       "label": "Email",
-      "note": "2500013578@stu.pku.edu.cn",
+      "note": "welcome to contact me",
       "href": "mailto:2500013578@stu.pku.edu.cn",
       "icon": "email",
       "visible": true
     }
   ],
   "defaults": {
-    "cover": "assets/book-cover-cherry.webp",
+    "cover": "assets/uploads/1788017913286-146867220-p0-9d5da098.webp",
     "background": ""
   }
 }

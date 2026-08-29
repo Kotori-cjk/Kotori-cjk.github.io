@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "id": "https://music.163.com/song?id=1492792890&uct2=U2FsdGVkX183Guy07KcqZ9rX/kSmkxYV3pwpHYYLYl0=",
+    "title": "Mood",
+    "artist": "24kGoldn /Justin Bieber /J. Balvin / iann dior",
+    "cover": "assets/uploads/1788018241638-anima-00004-6da34fbb.webp",
+    "order": 1,
+    "visible": true
+  },
+  {
+    "id": "https://music.163.com/song?id=28466084&uct2=U2FsdGVkX1/xp4HuZWx55GfdfVSI+GVrZvBR8yTUptk=",
+    "title": "琉璃之鸟",
+    "artist": "",
+    "cover": "assets/uploads/1788018245068-favorite-00004-4910d3e6.webp",
+    "order": 2,
+    "visible": true
+  }
+]

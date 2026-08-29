@@ -2,41 +2,40 @@
   {
     "id": "homepage",
     "title": "Kotori Homepage",
-    "description": "日系画册风格的个人主页、博客、项目与公开音乐入口。",
+    "description": "Entrance to me",
     "url": "https://github.com/Kotori-cjk/Kotori-cjk.github.io",
-    "tags": ["Homepage", "Vanilla JS"],
-    "cover": "assets/book-cover-cherry.webp",
+    "tags": [
+      "Homepage",
+      "Vanilla JS"
+    ],
+    "cover": "assets/uploads/1788017583631-76122099-p0-20a7cd67.webp",
     "order": 1,
-    "visible": true
-  },
-  {
-    "id": "luogu-journey",
-    "title": "Luogu Journey",
-    "description": "算法学习计划、专题页面与复习笔记。",
-    "url": "https://github.com/Kotori-cjk/luogu-journey",
-    "tags": ["Algorithm", "Study"],
-    "cover": "",
-    "order": 2,
-    "visible": true
-  },
-  {
-    "id": "luogu-ai-journey",
-    "title": "Luogu AI Journey",
-    "description": "面向题目分析、代码理解与 AI 辅助学习的单页工具。",
-    "url": "https://github.com/Kotori-cjk/luogu-ai-journey",
-    "tags": ["Code Analysis", "AI"],
-    "cover": "",
-    "order": 3,
     "visible": true
   },
   {
     "id": "course-recite",
     "title": "Course Recite",
-    "description": "公开的课程背诵与练习站点。",
+    "description": "A public site for reciting politic courses",
     "url": "https://github.com/Kotori-cjk/recite",
-    "tags": ["Recite", "Education"],
-    "cover": "",
+    "tags": [
+      "Recite",
+      "Education"
+    ],
+    "cover": "assets/uploads/1788017901630-76172907-p0-681551e8.webp",
     "order": 4,
+    "visible": true
+  },
+  {
+    "id": "project-1788016843879",
+    "title": "CompireTheSpire",
+    "description": "Our Qt homwork ",
+    "url": "https://github.com/Kotori-cjk/CompileTheSpire",
+    "tags": [
+      "RPG game",
+      "meta-learning"
+    ],
+    "cover": "assets/uploads/1788017905646-83428525-p0-081c1837.webp",
+    "order": 3,
     "visible": true
   }
 ]
