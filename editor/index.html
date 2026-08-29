@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob: https://raw.githubusercontent.com; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self' https://api.github.com https://raw.githubusercontent.com; frame-src 'self' blob:; base-uri 'none'; form-action 'none'">
+  <title>Kotori Content Studio</title>
+  <link rel="stylesheet" href="editor.css">
+</head>
+<body>
+  <header class="studio-header">
+    <div><a href="../">← Homepage</a><p>CONTENT STUDIO</p><h1>Kotori 内容编辑器</h1></div>
+    <div class="header-actions"><span id="save-state" class="save-state">正在载入…</span><button id="undo-btn" type="button">撤销</button><button id="discard-btn" type="button">放弃草稿</button><button id="preview-btn" type="button">整站预览</button><button id="publish-btn" class="primary" type="button">发布到 GitHub</button></div>
+  </header>
+
+  <div class="studio-layout">
+    <aside class="studio-sidebar">
+      <nav id="studio-tabs" aria-label="编辑器栏目">
+        <button class="active" type="button" data-tab="site">站点资料</button><button type="button" data-tab="interests">兴趣切片</button><button type="button" data-tab="posts">博客随笔</button><button type="button" data-tab="projects">项目一览</button><button type="button" data-tab="links">外部链接</button><button type="button" data-tab="music">音乐清单</button><button type="button" data-tab="assets">素材库</button>
+      </nav>
+      <section class="connection-card"><p>GITHUB CONNECTION</p><strong id="connection-title">预览模式</strong><span id="connection-note">连接仓库后可载入草稿文章并发布。</span><label>Fine-grained token<input id="token-input" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_…"></label><button id="connect-btn" type="button">连接 Homepage 仓库</button><small>令牌只保存在当前页面内存，关闭即消失。</small></section>
+    </aside>
+    <main id="editor-panel" class="editor-panel" aria-live="polite"></main>
+  </div>
+
+  <dialog id="preview-dialog" class="studio-dialog preview-dialog"><div class="dialog-bar"><strong>整站内容预览</strong><div><button type="button" data-preview-size="desktop">桌面</button><button type="button" data-preview-size="mobile">手机</button><button type="button" data-close-dialog>关闭</button></div></div><iframe id="site-preview" title="Homepage 内容预览"></iframe></dialog>
+  <dialog id="publish-dialog" class="studio-dialog publish-dialog"><form method="dialog"><button class="dialog-close" value="cancel" aria-label="关闭">×</button><p class="dialog-kicker">ATOMIC GIT COMMIT</p><h2>发布公开内容</h2><p>以下内容将作为一个 commit 写入 <code>main</code>，随后触发 GitHub Pages 构建。</p><div id="change-list" class="change-list"></div><label>提交说明<input id="commit-message" type="text" value="Update public homepage content" maxlength="100"></label><p id="publish-status" class="publish-status"></p><div class="publish-actions"><button value="cancel">取消</button><button id="confirm-publish" class="primary" type="button">确认发布</button></div></form></dialog>
+
+  <input id="asset-upload" type="file" accept="image/*" multiple hidden>
+  <script src="../vendor/markdown-it.min.js"></script>
+  <script type="module" src="editor.js"></script>
+</body>
+</html>

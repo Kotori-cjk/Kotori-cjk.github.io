@@ -1,14 +1,13 @@
-const STATE_KEY = 'kotori-homepage-v2';
+const STATE_KEY = 'kotori-homepage-v3';
 const LEGACY_KEY = 'kotori-seika-v1';
 const DB_NAME = 'kotori-seika-images';
 const STORE_NAME = 'images';
 
 const defaultState = {
-  version: 2,
+  version: 3,
   coverImage: '',
   backgrounds: [],
-  currentBg: -1,
-  musicIds: []
+  currentBg: -1
 };
 
 let db;
@@ -60,7 +59,13 @@ function loadState() {
   try {
     const saved = JSON.parse(localStorage.getItem(STATE_KEY) || 'null');
     if (saved) {
-      state = { ...defaultState, ...saved, version: 2 };
+      state = { ...defaultState, coverImage: saved.coverImage || '', backgrounds: Array.isArray(saved.backgrounds) ? saved.backgrounds : [], currentBg: Number.isInteger(saved.currentBg) ? saved.currentBg : -1 };
+      return;
+    }
+    const previous = JSON.parse(localStorage.getItem('kotori-homepage-v2') || 'null');
+    if (previous) {
+      state = { ...defaultState, coverImage: previous.coverImage || '', backgrounds: Array.isArray(previous.backgrounds) ? previous.backgrounds : [], currentBg: Number.isInteger(previous.currentBg) ? previous.currentBg : -1 };
+      saveState();
       return;
     }
     const legacy = JSON.parse(localStorage.getItem(LEGACY_KEY) || 'null');
@@ -69,7 +74,7 @@ function loadState() {
       ...defaultState,
       backgrounds: Array.isArray(settings.backgrounds) ? settings.backgrounds : [],
       currentBg: Number.isInteger(settings.currentBg) ? settings.currentBg : -1,
-      musicIds: Array.isArray(settings.musicIds) ? settings.musicIds : []
+      coverImage: settings.coverImage || ''
     };
     saveState();
   } catch (_) {
@@ -111,7 +116,8 @@ async function removeImage(key) {
 async function exportHomepage() {
   const usedKeys = new Set([state.coverImage, ...state.backgrounds].filter(Boolean));
   const exportImages = Object.fromEntries([...usedKeys].filter(key => images[key]).map(key => [key, images[key]]));
-  const blob = new Blob([JSON.stringify({ state, images: exportImages }, null, 2)], { type: 'application/json' });
+  const appearance = { version: 3, coverImage: state.coverImage, backgrounds: state.backgrounds, currentBg: state.currentBg };
+  const blob = new Blob([JSON.stringify({ state: appearance, images: exportImages }, null, 2)], { type: 'application/json' });
   const link = document.createElement('a');
   link.href = URL.createObjectURL(blob);
   link.download = 'kotori-homepage-backup.json';
@@ -126,7 +132,7 @@ async function importHomepage(file) {
     await putImage(key, value);
     images[key] = value;
   }
-  state = { ...defaultState, ...payload.state, version: 2 };
+  state = { ...defaultState, coverImage: payload.state.coverImage || '', backgrounds: Array.isArray(payload.state.backgrounds) ? payload.state.backgrounds : [], currentBg: Number.isInteger(payload.state.currentBg) ? payload.state.currentBg : -1 };
   saveState();
 }
 
@@ -138,5 +144,5 @@ export async function initStorage() {
 }
 
 export function getState() { return state; }
-export function updateState(patch) { state = { ...state, ...patch, version: 2 }; saveState(); return state; }
+export function updateState(patch) { state = { ...state, ...patch, version: 3 }; saveState(); return state; }
 export { imageUrl, saveImage, removeImage, exportHomepage, importHomepage };

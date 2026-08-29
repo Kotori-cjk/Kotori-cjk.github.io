@@ -1,0 +1,95 @@
+{
+  "hero": {
+    "eyebrow": "こんにちは、Kotoriです~",
+    "lines": [
+      "幾度も 羽の亡き蝶が 畏れる空で，",
+      "永久に闘うでしょう（眠れるように），"
+    ],
+    "primaryLabel": "翻阅画册"
+  },
+  "about": {
+    "quote": "そして始まる、\nきみとはぐ、のセカイ!",
+    "text": "a second-grade pku undergraduate with keen interest in AI, ACGN and scientific novels. Welcome to contact me at 2500013578@stu.pku.edu.cn"
+  },
+  "interests": [
+    {
+      "id": "acgn-works",
+      "title": "ACGN Works",
+      "items": [
+        "动画：小林家的龙女仆、冰菓、JoJo、刀剑神域、缘之空",
+        "漫画：点兔、碧蓝之海",
+        "游戏：FGO、さくら、もゆ、饥荒、anemoi",
+        "轻小说：约会大作战、春物、樱花庄、败犬女主、游戏人生"
+      ],
+      "visible": true
+    },
+    {
+      "id": "science-fantasy",
+      "title": "Science & Fantasy",
+      "items": [
+        "沙丘、黑暗的左手、三体、基地、微宇宙的上帝",
+        "侏罗纪公园、异形、变形金刚",
+        "哈利·波特、克苏鲁神话、好兆头、指环王、加勒比海盗"
+      ],
+      "visible": true
+    },
+    {
+      "id": "musicians",
+      "title": "Musicians",
+      "items": [
+        "Pop：Ed Sheeran、Justin Bieber、Charlie Puth、Selena Gomez",
+        "Japanese：YOASOBI、ヨルシカ",
+        "ACG：霜月はるか、忍、三輪学、麻枝准、乐正绫"
+      ],
+      "visible": true
+    },
+    {
+      "id": "current-interests",
+      "title": "Current Interests",
+      "items": [
+        "二十世纪电气目录",
+        "アストラエアの白き永遠",
+        "把学习过程整理成可复用的工具"
+      ],
+      "visible": true
+    }
+  ],
+  "links": [
+    {
+      "id": "bangumi",
+      "label": "Bangumi",
+      "note": "动画与书影音记录",
+      "href": "https://bangumi.tv/user/1151382",
+      "icon": "番",
+      "visible": true
+    },
+    {
+      "id": "github",
+      "label": "GitHub",
+      "note": "代码与小工具",
+      "href": "https://github.com/Kotori-cjk",
+      "icon": "GH",
+      "visible": true
+    },
+    {
+      "id": "x",
+      "label": "X",
+      "note": "偶尔出现的碎片",
+      "href": "https://x.com/KotoriMare",
+      "icon": "X",
+      "visible": true
+    },
+    {
+      "id": "email",
+      "label": "Email",
+      "note": "2500013578@stu.pku.edu.cn",
+      "href": "mailto:2500013578@stu.pku.edu.cn",
+      "icon": "@",
+      "visible": true
+    }
+  ],
+  "defaults": {
+    "cover": "assets/book-cover-cherry.webp",
+    "background": ""
+  }
+}

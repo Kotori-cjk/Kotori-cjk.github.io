@@ -1,0 +1,42 @@
+[
+  {
+    "id": "homepage",
+    "title": "Kotori Homepage",
+    "description": "日系画册风格的个人主页、博客、项目与公开音乐入口。",
+    "url": "https://github.com/Kotori-cjk/Kotori-cjk.github.io",
+    "tags": ["Homepage", "Vanilla JS"],
+    "cover": "assets/book-cover-cherry.webp",
+    "order": 1,
+    "visible": true
+  },
+  {
+    "id": "luogu-journey",
+    "title": "Luogu Journey",
+    "description": "算法学习计划、专题页面与复习笔记。",
+    "url": "https://github.com/Kotori-cjk/luogu-journey",
+    "tags": ["Algorithm", "Study"],
+    "cover": "",
+    "order": 2,
+    "visible": true
+  },
+  {
+    "id": "luogu-ai-journey",
+    "title": "Luogu AI Journey",
+    "description": "面向题目分析、代码理解与 AI 辅助学习的单页工具。",
+    "url": "https://github.com/Kotori-cjk/luogu-ai-journey",
+    "tags": ["Code Analysis", "AI"],
+    "cover": "",
+    "order": 3,
+    "visible": true
+  },
+  {
+    "id": "course-recite",
+    "title": "Course Recite",
+    "description": "公开的课程背诵与练习站点。",
+    "url": "https://github.com/Kotori-cjk/recite",
+    "tags": ["Recite", "Education"],
+    "cover": "",
+    "order": 4,
+    "visible": true
+  }
+]

@@ -16,3 +16,16 @@
 - **Local files:** `vendor/st-page-flip/page-flip.browser.js` and its bundled `LICENSE`.
 
 Paper, tape, record, and sticker treatments are original CSS shapes and do not load third-party assets at runtime.
+
+## Theme and player references
+
+- **Hugo Theme Stack:** https://github.com/CaiJimmy/hugo-theme-stack
+- **Use:** visual reference for rounded cards, article covers, spacing, and soft shadows. No Stack source code is bundled.
+- **Music player reference:** https://www.elainafan.one/p/music-player/
+- **Use:** interaction reference for a compact floating playlist. The Homepage player implementation is original JavaScript and CSS.
+
+## Markdown build tools
+
+- **markdown-it:** https://github.com/markdown-it/markdown-it — MIT License
+- **gray-matter:** https://github.com/jonschlinkert/gray-matter — MIT License
+- Used at build time for safe Markdown rendering with raw HTML disabled and frontmatter parsing.
