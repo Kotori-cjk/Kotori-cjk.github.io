@@ -4,6 +4,7 @@
     "title": "Mood",
     "artist": "24kGoldn /Justin Bieber /J. Balvin / iann dior",
     "cover": "assets/uploads/1788018241638-anima-00004-6da34fbb.webp",
+    "externalOnly": true,
     "order": 1,
     "visible": true
   },
@@ -12,6 +13,7 @@
     "title": "琉璃之鸟",
     "artist": "",
     "cover": "assets/uploads/1788018245068-favorite-00004-4910d3e6.webp",
+    "externalOnly": true,
     "order": 2,
     "visible": true
   }

@@ -6,11 +6,10 @@
 
 ```powershell
 npm install --cache .npm-cache
-npm run build:local
-python -m http.server 8000 -d dist
+npm run editor
 ```
 
-打开 <http://localhost:8000/>。本地编辑器位于 <http://localhost:8000/editor/>。线上 GitHub Actions 使用 `npm run build`，不会把编辑器或编辑器入口部署到公开网站。
+打开 <http://localhost:8000/>。本地编辑器位于 <http://localhost:8000/editor/>。`npm run editor` 同时提供仅限本机的网易云歌曲信息代理，因此粘贴歌曲链接后可以自动填写曲名、歌手并下载封面。线上 GitHub Actions 使用 `npm run build`，不会把编辑器、编辑器入口或本地代理部署到公开网站。
 
 ## 公开内容
 

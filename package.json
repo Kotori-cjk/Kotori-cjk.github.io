@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "build:local": "node scripts/build.mjs --include-editor"
+    "build:local": "node scripts/build.mjs --include-editor",
+    "editor": "npm run build:local && node scripts/editor-server.mjs"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",

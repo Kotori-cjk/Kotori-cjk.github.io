@@ -29,6 +29,7 @@ function slugify(value) { return String(value || '').toLowerCase().replace(/[^a-
 function tagsFrom(value) { return String(value || '').split(/[,，]/).map(item => item.trim()).filter(Boolean); }
 function listFrom(value) { return String(value || '').split(/\r?\n/).map(item => item.trim()).filter(Boolean); }
 function json(value) { return `${JSON.stringify(value, null, 2)}\n`; }
+function musicIdFrom(value) { const input=String(value||'').trim();if(/^\d+$/.test(input))return input;return input.match(/[?&]id=(\d+)/)?.[1]||input.match(/song\/(\d+)/)?.[1]||''; }
 
 function parseFrontmatter(raw, path) {
   const match = String(raw).match(/^---\s*\r?\n([\s\S]*?)\r?\n---\s*\r?\n?([\s\S]*)$/);
@@ -167,6 +168,32 @@ function schemas(type) {
   return [{key:'id',label:'网易云链接或 ID'},{key:'title',label:'曲名'},{key:'artist',label:'歌手'},{key:'cover',label:'封面素材路径'}];
 }
 
+async function importMusic(input) {
+  const value=String(input||'').trim();if(!value)throw new Error('请粘贴网易云歌曲链接或 ID');
+  const response=await fetch(`/api/netease-song?input=${encodeURIComponent(value)}`);const song=await response.json();if(!response.ok)throw new Error(song.error||'歌曲信息读取失败');
+  const id=String(song.id);if(state.music.some(item=>musicIdFrom(item.id)===id))throw new Error('这首歌已经在清单中');
+  checkpoint();
+  let cover=song.cover||'';
+  try{const coverResponse=await fetch(`/api/netease-cover?id=${encodeURIComponent(id)}`);if(coverResponse.ok){const source=await coverResponse.blob();const blob=await compressImage(new File([source],`netease-${id}.jpg`,{type:source.type||'image/jpeg'}));if(blob){const path=`assets/uploads/music-${id}-${crypto.randomUUID().slice(0,8)}.webp`;state.pendingAssets.push({path,blob,objectUrl:URL.createObjectURL(blob)});cover=path;}}}catch(_){/* remote cover URL remains usable */}
+  state.music.push({id,title:song.title,artist:song.artist,cover,externalOnly:song.playable===false,order:state.music.length+1,visible:true});markDirty();render();
+}
+
+function musicCoverUrl(path) { const pending=state.pendingAssets.find(asset=>asset.path===path);return pending?.objectUrl||(path?.startsWith('assets/')?`../${path}`:path||''); }
+
+function renderMusic() {
+  const items=state.music;
+  const cards=items.map((item,index)=>`<article class="collection-card"><div class="collection-head"><strong>${escapeHtml(item.title||`网易云歌曲 ${item.id}`)}</strong><div class="card-actions"><button type="button" data-music-move="up" data-index="${index}" aria-label="上移">↑</button><button type="button" data-music-move="down" data-index="${index}" aria-label="下移">↓</button><button type="button" data-music-delete data-index="${index}" aria-label="删除">×</button></div></div><div class="music-item-preview">${item.cover?`<img src="${escapeHtml(musicCoverUrl(item.cover))}" alt="">`:''}<div><b>${escapeHtml(item.title||'')}</b><span>${escapeHtml(item.artist||'')}</span><small>网易云 ID：${escapeHtml(musicIdFrom(item.id))}</small><em class="music-playability ${item.externalOnly?'limited':'playable'}">${item.externalOnly?'版权/VIP 曲目：公开站只能跳转网易云':'可在公开站内播放'}</em></div></div><details class="music-manual"><summary>手动修正歌曲信息</summary><div class="form-grid">${schemas('music').map(entry=>field(entry.label,`${index}.${entry.key}`,item[entry.key]??'')).join('')}<label class="visibility-row wide"><input data-music-visible data-index="${index}" type="checkbox" ${item.visible!==false?'checked':''}> 对访客显示</label></div></details></article>`).join('');
+  const importer='<div class="music-import"><input id="music-link-input" type="text" placeholder="粘贴网易云歌曲链接或 ID"><button id="music-import-btn" class="primary" type="button">自动识别并添加</button><span id="music-import-status">曲名、歌手和封面将自动获取</span></div>';
+  panel.innerHTML=section('音乐清单','粘贴网易云歌曲链接即可自动识别信息并下载封面。下方字段仅用于识别失败后的修正。',`${importer}<div class="collection-list">${cards||'<p class="empty-state">暂无曲目</p>'}</div>`);
+  const input=panel.querySelector('#music-link-input');const button=panel.querySelector('#music-import-btn');const status=panel.querySelector('#music-import-status');
+  const submit=async()=>{button.disabled=true;status.textContent='正在读取歌曲信息和封面…';try{await importMusic(input.value);}catch(error){status.textContent=error.message;}finally{button.disabled=false;}};
+  button.addEventListener('click',submit);input.addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();submit();}});
+  panel.querySelectorAll('[data-field]').forEach(control=>control.addEventListener('input',()=>{const [index,key]=control.dataset.field.split('.',2);items[index][key]=control.value;markDirty();}));
+  panel.querySelectorAll('[data-music-visible]').forEach(control=>control.addEventListener('change',()=>mutate(()=>{items[Number(control.dataset.index)].visible=control.checked;})));
+  panel.querySelectorAll('[data-music-delete]').forEach(control=>control.addEventListener('click',()=>mutate(()=>{const [removed]=items.splice(Number(control.dataset.index),1);const pending=state.pendingAssets.find(asset=>asset.path===removed?.cover);if(pending&&!isAssetReferenced(pending.path)){URL.revokeObjectURL(pending.objectUrl);state.pendingAssets=state.pendingAssets.filter(asset=>asset!==pending);}items.forEach((item,index)=>item.order=index+1);},true)));
+  panel.querySelectorAll('[data-music-move]').forEach(control=>control.addEventListener('click',()=>mutate(()=>{const index=Number(control.dataset.index);const target=control.dataset.musicMove==='up'?index-1:index+1;if(target<0||target>=items.length)return;[items[index],items[target]]=[items[target],items[index]];items.forEach((item,order)=>item.order=order+1);},true)));
+}
+
 function renderPosts() {
   if (!state.posts.length) {
     panel.innerHTML = section('博客随笔','Markdown 写作、实时预览和草稿发布。连接 GitHub 后会载入仓库内未公开草稿。','<p class="empty-state">还没有文章。点击右上角开始第一篇随笔。</p>','<button id="add-first-post" class="add-button" type="button">＋ 新建文章</button>');
@@ -218,7 +245,7 @@ function render() {
   else if(activeTab==='posts')renderPosts();
   else if(activeTab==='projects')renderCollection('projects','项目一览','手选公开项目，排序即为访客看到的顺序。',schemas('projects'));
   else if(activeTab==='links')renderCollection('links','外部链接','管理所有访客可见的个人链接。',schemas('links'));
-  else if(activeTab==='music')renderCollection('music','音乐清单','网易云曲目会出现在 Homepage 右下角播放器。',schemas('music'));
+  else if(activeTab==='music')renderMusic();
   else renderAssets();
 }
 

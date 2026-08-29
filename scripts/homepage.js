@@ -1,7 +1,7 @@
 import { SITE_CONFIG } from '../site-config.js';
 import { initStorage, getState, updateState, imageUrl, saveImage, removeImage, exportHomepage, importHomepage } from './storage.js';
 import { initRevealMotion, initBookIntro } from './motion.js?v=20260829-4';
-import { initPlayer } from './player.js';
+import { initPlayer } from './player.js?v=20260829-5';
 import { initRippleEffects } from './interactions.js';
 
 let publicSite;
