@@ -60,7 +60,7 @@
       "label": "Bangumi",
       "note": "动画与书影音记录",
       "href": "https://bangumi.tv/user/1151382",
-      "icon": "番",
+      "icon": "bangumi",
       "visible": true
     },
     {
@@ -68,7 +68,7 @@
       "label": "GitHub",
       "note": "代码与小工具",
       "href": "https://github.com/Kotori-cjk",
-      "icon": "GH",
+      "icon": "github",
       "visible": true
     },
     {
@@ -76,7 +76,7 @@
       "label": "X",
       "note": "偶尔出现的碎片",
       "href": "https://x.com/KotoriMare",
-      "icon": "X",
+      "icon": "x",
       "visible": true
     },
     {
@@ -84,7 +84,7 @@
       "label": "Email",
       "note": "2500013578@stu.pku.edu.cn",
       "href": "mailto:2500013578@stu.pku.edu.cn",
-      "icon": "@",
+      "icon": "email",
       "visible": true
     }
   ],

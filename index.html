@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@500;700&family=Noto+Sans+SC:wght@300;400;500;700&family=Yusei+Magic&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="homepage.css?v=20260829-2">
+    <link rel="stylesheet" href="homepage.css?v=20260829-3">
 </head>
 <body class="cover-closed">
     <div id="bg-layer" aria-hidden="true"></div><div class="paper-noise" aria-hidden="true"></div>
@@ -37,15 +37,15 @@
             <div class="hero-collage reveal-section glow-region" data-reveal="right" aria-label="Kotori 的画册拼贴"><figure class="photo-card photo-main"><img id="hero-cover" src="assets/book-cover-cherry.webp" alt="Homepage 默认封面"><figcaption>Kotori's visual album</figcaption></figure><div class="sticker sticker-pink">ことり</div><div class="sticker sticker-note">Colorful<br>Journey</div><div class="tape tape-one" aria-hidden="true"></div><div class="tape tape-two" aria-hidden="true"></div></div>
         </section>
 
-        <section id="about" class="album-section about-section reveal-section" data-reveal="up">
-            <div class="section-heading"><span>01</span><div><small>A little introduction</small><h2>关于 Kotori</h2></div></div>
-            <div class="about-grid"><article class="paper-card profile-note glow-region ripple-target"><p id="about-quote" class="large-handwriting"></p><p id="about-text"></p></article><article class="paper-card gate-card glow-region"><img src="assets/colorful-seika-logo.png" alt="Colorful Seika logo"><div><small>PRIVATE STUDY ROOM</small><h3>Kotori's Colorful Seika</h3><button id="gate-space-btn" class="ripple-target" type="button">输入密码进入</button></div></article></div>
+        <section id="about" class="album-section about-section">
+            <div class="section-heading reveal-section" data-reveal="left"><span>01</span><div><small>A little introduction</small><h2>关于 Kotori</h2></div></div>
+            <div class="about-grid"><article class="paper-card profile-note reveal-section glow-region ripple-target" data-reveal="left"><p id="about-quote" class="large-handwriting"></p><p id="about-text"></p></article><article class="paper-card gate-card reveal-section glow-region" data-reveal="right" style="--reveal-delay:90ms"><img src="assets/colorful-seika-logo.png" alt="Colorful Seika logo"><div><small>PRIVATE STUDY ROOM</small><h3>Kotori's Colorful Seika</h3><button id="gate-space-btn" class="ripple-target" type="button">输入密码进入</button></div></article></div>
         </section>
 
         <section id="interests" class="album-section interests-section"><div class="section-heading reveal-section" data-reveal="left"><span>02</span><div><small>Things I keep returning to</small><h2>兴趣切片</h2></div></div><div id="interest-grid" class="interest-grid"></div></section>
         <section id="blog" class="album-section blog-section"><div class="section-heading reveal-section" data-reveal="right"><span>03</span><div><small>Notes from slow afternoons</small><h2>博客随笔</h2></div></div><div id="blog-grid" class="blog-grid"></div></section>
         <section id="projects" class="album-section projects-section"><div class="section-heading reveal-section" data-reveal="left"><span>04</span><div><small>Things I build and keep</small><h2>项目一览</h2></div></div><div id="project-grid" class="project-grid"></div></section>
-        <section id="links" class="album-section links-section reveal-section" data-reveal="up"><div class="section-heading compact-heading"><span>05</span><div><small>Find me elsewhere</small><h2>外部链接</h2></div></div><div id="external-links" class="external-links"></div></section>
+        <section id="links" class="album-section links-section"><div class="section-heading compact-heading reveal-section" data-reveal="left"><span>05</span><div><small>Find me elsewhere</small><h2>外部链接</h2></div></div><div id="external-links" class="external-links"></div></section>
         <footer class="footer reveal-section" data-reveal="up"><span>Made as a small personal album.</span><button id="reopen-cover-btn" class="ripple-target" type="button">重新合上画册</button></footer>
     </main>
 
@@ -53,6 +53,6 @@
 
     <dialog id="settings-dialog" class="site-dialog settings-dialog"><form method="dialog"><button class="dialog-close ripple-target" value="cancel" aria-label="关闭">×</button><p class="dialog-kicker">PERSONALIZE THE ALBUM</p><h2>画册设置</h2><section class="setting-block"><h3>封面图片</h3><p>这是仅保存在当前浏览器的个人封面；公共默认内容只在本地维护。</p><div class="setting-actions"><input id="cover-upload" type="file" accept="image/*" hidden><button id="cover-upload-btn" class="ripple-target" type="button">上传个人封面</button><button id="cover-reset-btn" class="ripple-target" type="button">恢复公共默认</button></div><div id="cover-preview" class="cover-preview"></div></section><section class="setting-block"><h3>页面背景</h3><div class="setting-actions"><input id="bg-upload" type="file" accept="image/*" multiple hidden><button id="bg-upload-btn" class="ripple-target" type="button">上传个人背景</button><button id="bg-reset-btn" class="ripple-target" type="button">使用公共默认</button></div><div id="bg-preview-list" class="bg-preview-list"></div></section><section class="setting-block"><h3>迁移与备份</h3><p>导出文件仅包含当前浏览器的个人封面与背景设置。</p><div class="setting-actions"><button id="export-home-btn" class="ripple-target" type="button">导出个人外观</button><input id="import-home-file" type="file" accept="application/json,.json" hidden><button id="import-home-btn" class="ripple-target" type="button">导入个人外观</button></div></section></form></dialog>
 
-    <script src="vendor/st-page-flip/page-flip.browser.js"></script><script type="module" src="scripts/homepage.js?v=20260829-2"></script>
+    <script src="vendor/st-page-flip/page-flip.browser.js"></script><script type="module" src="scripts/homepage.js?v=20260829-3"></script>
 </body>
 </html>

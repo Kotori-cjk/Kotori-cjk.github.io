@@ -163,7 +163,7 @@ function defaultItem(type) {
 function schemas(type) {
   if (type === 'interests') return [{key:'title',label:'标题'},{key:'items',label:'内容（每行一项）',type:'textarea',wide:true,format:value=>(value||[]).join('\n'),parse:listFrom}];
   if (type === 'projects') return [{key:'title',label:'项目名'},{key:'url',label:'GitHub 链接'},{key:'description',label:'简介',type:'textarea',wide:true},{key:'tags',label:'标签（逗号分隔）',format:value=>(value||[]).join(', '),parse:tagsFrom},{key:'cover',label:'封面素材路径'}];
-  if (type === 'links') return [{key:'label',label:'名称'},{key:'href',label:'链接'},{key:'note',label:'说明',wide:true},{key:'icon',label:'文字图标'}];
+  if (type === 'links') return [{key:'label',label:'名称'},{key:'href',label:'链接'},{key:'note',label:'说明',wide:true},{key:'icon',label:'图标类型（github / bangumi / x / email）'}];
   return [{key:'id',label:'网易云链接或 ID'},{key:'title',label:'曲名'},{key:'artist',label:'歌手'},{key:'cover',label:'封面素材路径'}];
 }
 
