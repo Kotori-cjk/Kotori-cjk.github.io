@@ -12,7 +12,6 @@ export function initRevealMotion() {
 
 export function initBookIntro({ onOpen }) {
   const button = document.getElementById('open-book-btn');
-  const stage = document.querySelector('.book-stage');
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   let opened = false;
   let pageFlip;
@@ -39,29 +38,19 @@ export function initBookIntro({ onOpen }) {
     if (opened) return;
     opened = true;
     document.body.classList.add('book-opening');
-    const finish = () => {
+    if (pageFlip) pageFlip.flipNext('top');
+    window.setTimeout(() => {
       document.body.classList.remove('cover-closed', 'book-opening');
       document.body.classList.add('book-open');
       document.getElementById('homepage').setAttribute('aria-hidden', 'false');
       onOpen?.();
-    };
-    window.setTimeout(finish, reduced ? 80 : (pageFlip ? 1180 : 180));
-    try { pageFlip?.flipNext('top'); }
-    catch (error) { console.warn('Page flip animation skipped:', error); }
+    }, reduced ? 80 : 1180);
   };
 
-  stage.addEventListener('click', event => {
-    event.preventDefault();
-    event.stopPropagation();
-    open();
-  }, { capture: true });
   button.addEventListener('click', open);
   document.addEventListener('keydown', event => {
     if (!opened && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); open(); }
   });
   requestAnimationFrame(() => document.body.classList.add('cover-ready'));
-  window.setTimeout(() => {
-    if (!opened && document.body.classList.contains('cover-closed')) stage.classList.add('book-is-ready');
-  }, 300);
   return open;
 }

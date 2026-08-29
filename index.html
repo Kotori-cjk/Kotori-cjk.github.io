@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@500;700&family=Noto+Sans+SC:wght@300;400;500;700&family=Yusei+Magic&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="homepage.css?v=20260829-3">
+    <link rel="stylesheet" href="homepage.css?v=20260829-4">
 </head>
 <body class="cover-closed">
     <div id="bg-layer" aria-hidden="true"></div><div class="paper-noise" aria-hidden="true"></div>
@@ -19,9 +19,9 @@
         <div class="book-stage">
             <div id="intro-book" class="intro-book">
                 <div class="book-page cover-page" data-density="hard"><div id="cover-art" class="cover-art"></div><div class="cover-wash"></div><div class="cover-copy"><small>Kotori's private album</small><strong>Colorful<br>Seika</strong><em>そして始まる、きみとはぐ、のセカイ!</em></div><div class="cover-hint">点击翻开 · Enter 打开</div></div>
-                <div class="book-page inside-page"><div class="inside-content"><strong>Kotori's Homepage</strong></div></div>
+                <div class="book-page inside-page"><span class="inside-flower">桜</span><small>WELCOME TO</small><strong>Kotori's Homepage</strong><p>ACGN · Science Fiction · Music · Study</p></div>
             </div>
-            <button id="open-book-btn" class="open-book-overlay ripple-target" type="button" aria-label="打开 Kotori 的 Homepage"></button>
+            <button id="open-book-btn" class="open-book-overlay" type="button" aria-label="打开 Kotori 的 Homepage"></button>
         </div>
         <div class="intro-frame intro-frame-right" aria-hidden="true"><span>彩りの日々</span></div>
     </section>
@@ -46,13 +46,13 @@
         <section id="blog" class="album-section blog-section"><div class="section-heading reveal-section" data-reveal="right"><span>03</span><div><small>Notes from slow afternoons</small><h2>博客随笔</h2></div></div><div id="blog-grid" class="blog-grid"></div></section>
         <section id="projects" class="album-section projects-section"><div class="section-heading reveal-section" data-reveal="left"><span>04</span><div><small>Things I build and keep</small><h2>项目一览</h2></div></div><div id="project-grid" class="project-grid"></div></section>
         <section id="links" class="album-section links-section"><div class="section-heading compact-heading reveal-section" data-reveal="left"><span>05</span><div><small>Find me elsewhere</small><h2>外部链接</h2></div></div><div id="external-links" class="external-links"></div></section>
-        <footer class="footer reveal-section" data-reveal="up"><span>Made as a small personal album.</span><button id="reopen-cover-btn" class="ripple-target" type="button">重新合上画册</button></footer>
+        <footer class="footer reveal-section" data-reveal="up"><span>Made as a small personal album.</span><button id="reopen-cover-btn" class="ripple-target" type="button">退回封面</button></footer>
     </main>
 
     <aside id="music-player" class="floating-player" aria-label="公开音乐播放器"><button id="player-summary" class="player-summary ripple-target glow-region" type="button" aria-expanded="false"><span id="player-cover" class="player-cover" aria-hidden="true"></span><span class="player-copy"><small>PUBLIC PLAYLIST</small><strong id="player-title">暂无公开曲目</strong><span id="player-artist">在内容编辑器中添加</span></span><span class="player-chevron" aria-hidden="true">⌃</span></button><div id="player-panel" class="player-panel" hidden><div class="player-controls"><button id="player-prev" class="ripple-target" type="button" aria-label="上一首">←</button><span id="player-count">0 / 0</span><button id="player-next" class="ripple-target" type="button" aria-label="下一首">→</button></div><div id="player-embed" class="player-embed"></div><div id="player-list" class="player-list"></div></div></aside>
 
     <dialog id="settings-dialog" class="site-dialog settings-dialog"><form method="dialog"><button class="dialog-close ripple-target" value="cancel" aria-label="关闭">×</button><p class="dialog-kicker">PERSONALIZE THE ALBUM</p><h2>画册设置</h2><section class="setting-block"><h3>封面图片</h3><p>这是仅保存在当前浏览器的个人封面；公共默认内容只在本地维护。</p><div class="setting-actions"><input id="cover-upload" type="file" accept="image/*" hidden><button id="cover-upload-btn" class="ripple-target" type="button">上传个人封面</button><button id="cover-reset-btn" class="ripple-target" type="button">恢复公共默认</button></div><div id="cover-preview" class="cover-preview"></div></section><section class="setting-block"><h3>页面背景</h3><div class="setting-actions"><input id="bg-upload" type="file" accept="image/*" multiple hidden><button id="bg-upload-btn" class="ripple-target" type="button">上传个人背景</button><button id="bg-reset-btn" class="ripple-target" type="button">使用公共默认</button></div><div id="bg-preview-list" class="bg-preview-list"></div></section><section class="setting-block"><h3>迁移与备份</h3><p>导出文件仅包含当前浏览器的个人封面与背景设置。</p><div class="setting-actions"><button id="export-home-btn" class="ripple-target" type="button">导出个人外观</button><input id="import-home-file" type="file" accept="application/json,.json" hidden><button id="import-home-btn" class="ripple-target" type="button">导入个人外观</button></div></section></form></dialog>
 
-    <script src="vendor/st-page-flip/page-flip.browser.js"></script><script type="module" src="scripts/homepage.js?v=20260829-3"></script>
+    <script src="vendor/st-page-flip/page-flip.browser.js"></script><script type="module" src="scripts/homepage.js?v=20260829-4"></script>
 </body>
 </html>
