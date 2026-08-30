@@ -29,6 +29,7 @@ export function initPlayer(tracks) {
   const list = document.getElementById('player-list');
   const visibleTracks = (Array.isArray(tracks) ? tracks : []).filter(track => track?.visible !== false && parseMusicId(track?.id)).sort((a, b) => (a.order || 0) - (b.order || 0));
   const state = readState();
+  let renderedTrackKey = '';
   state.index = Math.min(Math.max(Number(state.index) || 0, 0), Math.max(visibleTracks.length - 1, 0));
 
   function render() {
@@ -42,7 +43,12 @@ export function initPlayer(tracks) {
     cover.style.backgroundImage = track?.cover ? `url("${track.cover}")` : '';
     count.textContent = track ? `${state.index + 1} / ${visibleTracks.length}` : '0 / 0';
     const musicId = track ? parseMusicId(track.id) : '';
-    embed.innerHTML = track && state.expanded ? (track.externalOnly ? `<div class="player-unavailable"><strong>该歌曲受网易云版权或 VIP 限制</strong><span>公开外链播放器无法提供音频，请在网易云中播放。</span><a href="https://music.163.com/song?id=${encodeURIComponent(musicId)}" target="_blank" rel="noreferrer">在网易云打开这首歌 ↗</a></div>` : `<iframe title="${escapeHtml(track.title || `网易云歌曲 ${track.id}`)}" loading="eager" scrolling="no" allow="autoplay; encrypted-media" src="https://music.163.com/outchain/player?type=2&id=${encodeURIComponent(musicId)}&auto=0&height=66"></iframe><a class="player-fallback" href="https://music.163.com/song?id=${encodeURIComponent(musicId)}" target="_blank" rel="noreferrer">播放器没有声音？在网易云打开这首歌 ↗</a>`) : '';
+    const trackKey = track ? `${musicId}:${Boolean(track.externalOnly)}` : '';
+    if (!track) { embed.innerHTML = ''; renderedTrackKey = ''; }
+    else if (state.expanded && trackKey !== renderedTrackKey) {
+      embed.innerHTML = track.externalOnly ? `<div class="player-unavailable"><strong>该歌曲受网易云版权或 VIP 限制</strong><span>公开外链播放器无法提供音频，请在网易云中播放。</span><a href="https://music.163.com/song?id=${encodeURIComponent(musicId)}" target="_blank" rel="noreferrer">在网易云打开这首歌 ↗</a></div>` : `<iframe title="${escapeHtml(track.title || `网易云歌曲 ${track.id}`)}" loading="eager" scrolling="no" allow="autoplay; encrypted-media" src="https://music.163.com/outchain/player?type=2&id=${encodeURIComponent(musicId)}&auto=0&height=66"></iframe><a class="player-fallback" href="https://music.163.com/song?id=${encodeURIComponent(musicId)}" target="_blank" rel="noreferrer">播放器没有声音？在网易云打开这首歌 ↗</a>`;
+      renderedTrackKey = trackKey;
+    }
     list.innerHTML = visibleTracks.map((item, index) => `<button class="player-list-item ripple-target${index === state.index ? ' active' : ''}" type="button" data-track-index="${index}"><span>${String(index + 1).padStart(2, '0')}</span><strong>${escapeHtml(item.title || `网易云歌曲 ${item.id}`)}</strong><small>${escapeHtml(item.artist || '')}</small></button>`).join('');
     writeState(state);
   }
