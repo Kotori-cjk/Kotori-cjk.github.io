@@ -16,5 +16,32 @@
     "externalOnly": false,
     "order": 2,
     "visible": true
+  },
+  {
+    "id": "544247584",
+    "title": "Strawberries & Cigarettes",
+    "artist": "Troye Sivan",
+    "cover": "assets/uploads/music-544247584-e9ac15a5.webp",
+    "externalOnly": true,
+    "order": 3,
+    "visible": true
+  },
+  {
+    "id": "460043708",
+    "title": "What Do I Know?",
+    "artist": "Ed Sheeran",
+    "cover": "assets/uploads/music-460043708-7a2fc396.webp",
+    "externalOnly": true,
+    "order": 4,
+    "visible": true
+  },
+  {
+    "id": "725698",
+    "title": "late in autumn",
+    "artist": "fripSide",
+    "cover": "assets/uploads/music-725698-59818735.webp",
+    "externalOnly": true,
+    "order": 5,
+    "visible": true
   }
 ]
