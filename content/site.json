@@ -91,5 +91,6 @@
   "defaults": {
     "cover": "assets/uploads/1788017894154-140100396-p1-420b5b53.webp",
     "background": ""
-  }
+  },
+  "newsletter": {}
 }

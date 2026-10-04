@@ -13,19 +13,6 @@
     "visible": true
   },
   {
-    "id": "course-recite",
-    "title": "Course Recite",
-    "description": "A public site for reciting politic courses",
-    "url": "https://github.com/Kotori-cjk/recite",
-    "tags": [
-      "Recite",
-      "Education"
-    ],
-    "cover": "assets/uploads/1788017901630-76172907-p0-681551e8.webp",
-    "order": 4,
-    "visible": true
-  },
-  {
     "id": "project-1788016843879",
     "title": "CompireTheSpire",
     "description": "Our Qt homwork ",
@@ -39,6 +26,18 @@
     "visible": true
   },
   {
+    "id": "project-1791086409148",
+    "title": "Visual Latex Editor",
+    "description": "A local latex editor with  WPS-styled simple operation",
+    "url": "https://github.com/Kotori-cjk/visual_latex_editor",
+    "tags": [
+      "latex editor"
+    ],
+    "cover": "assets/uploads/1791086608882-0377c4efebefce9910e4895c0a74848e-dc6e77e7.webp",
+    "order": 5,
+    "visible": true
+  },
+  {
     "id": "project-1788021714637",
     "title": "HomePageEditor",
     "description": "A local, safe-demo content editor for static personal homepages",
@@ -47,6 +46,19 @@
       "website editor"
     ],
     "cover": "assets/uploads/1788022010718-100230297-p0-9e103be8.webp",
+    "order": 4,
+    "visible": true
+  },
+  {
+    "id": "course-recite",
+    "title": "Course Recite",
+    "description": "A public site for reciting politic courses",
+    "url": "https://github.com/Kotori-cjk/recite",
+    "tags": [
+      "Recite",
+      "Education"
+    ],
+    "cover": "assets/uploads/1788017901630-76172907-p0-681551e8.webp",
     "order": 4,
     "visible": true
   }

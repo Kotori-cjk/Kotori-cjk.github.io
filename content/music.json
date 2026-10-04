@@ -27,20 +27,20 @@
     "visible": true
   },
   {
-    "id": "460043708",
-    "title": "What Do I Know?",
-    "artist": "Ed Sheeran",
-    "cover": "assets/uploads/music-460043708-7a2fc396.webp",
-    "externalOnly": true,
-    "order": 4,
-    "visible": true
-  },
-  {
     "id": "725698",
     "title": "late in autumn",
     "artist": "fripSide",
     "cover": "assets/uploads/music-725698-59818735.webp",
     "externalOnly": true,
+    "order": 4,
+    "visible": true
+  },
+  {
+    "id": "3407340933",
+    "title": "草笛ノ夢",
+    "artist": "VISUAL ARTS / Key",
+    "cover": "assets/uploads/music-3407340933-46a95234.webp",
+    "externalOnly": false,
     "order": 5,
     "visible": true
   }
