@@ -92,9 +92,13 @@ function articleTemplate(post) {
         <p>${escapeHtml(post.summary)}</p>
         <div class="article-tags">${tags}</div>
       </header>
-      ${toc}
-      ${coverMarkup}
-      <div class="article-body">${post.html}</div>
+      <div class="article-reading-layout">
+        ${toc}
+        <div class="article-content">
+          ${coverMarkup}
+          <div class="article-body">${post.html}</div>
+        </div>
+      </div>
     </article>
   </main>
   <script type="module" src="../../scripts/article.js"></script>
