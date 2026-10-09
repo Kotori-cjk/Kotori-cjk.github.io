@@ -7,7 +7,35 @@ const ROOT = process.cwd();
 const DIST = path.join(ROOT, 'dist');
 const POSTS_DIR = path.join(ROOT, 'content', 'posts');
 const INCLUDE_EDITOR = process.argv.includes('--include-editor');
-const markdown = new MarkdownIt({ html: false, linkify: true, typographer: true });
+function headingId(value, used) {
+  const base = String(value || 'section')
+    .toLowerCase()
+    .replace(/<[^>]*>/g, '')
+    .replace(/[^a-z0-9\u4e00-\u9fff]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'section';
+  let id = base;
+  let suffix = 2;
+  while (used.has(id)) id = `${base}-${suffix++}`;
+  used.add(id);
+  return id;
+}
+
+function renderPostMarkdown(source) {
+  const markdown = new MarkdownIt({ html: false, linkify: true, typographer: true });
+  const usedIds = new Set();
+  const toc = [];
+  const defaultHeading = markdown.renderer.rules.heading_open || ((tokens, index, options, env, self) => self.renderToken(tokens, index, options));
+  markdown.renderer.rules.heading_open = (tokens, index, options, env, self) => {
+    const token = tokens[index];
+    const level = Number(token.tag.slice(1));
+    const title = tokens[index + 1]?.content || '';
+    const id = headingId(title, usedIds);
+    token.attrSet('id', id);
+    if (level === 2 || level === 3) toc.push({ id, title, level });
+    return defaultHeading(tokens, index, options, env, self);
+  };
+  return { html: markdown.render(source), toc };
+}
 
 const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
@@ -37,6 +65,7 @@ function articleTemplate(post) {
   const cover = siteAsset(post.cover);
   const coverMarkup = cover ? `<figure class="article-cover"><img src="${escapeHtml(cover)}" alt="${escapeHtml(post.title)}"></figure>` : '';
   const tags = post.tags.map(tag => `<span>${escapeHtml(tag)}</span>`).join('');
+  const toc = post.toc?.length ? `<nav class="article-toc" aria-label="文章目录"><strong>文章目录</strong><div>${post.toc.map(item => `<a class="toc-level-${item.level}" href="#${escapeHtml(item.id)}">${escapeHtml(item.title)}</a>`).join('')}</div></nav>` : '';
   return `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -63,6 +92,7 @@ function articleTemplate(post) {
         <p>${escapeHtml(post.summary)}</p>
         <div class="article-tags">${tags}</div>
       </header>
+      ${toc}
       ${coverMarkup}
       <div class="article-body">${post.html}</div>
     </article>
@@ -90,7 +120,7 @@ async function buildPosts() {
       tags,
       draft: parsed.data.draft === true,
       source: raw,
-      html: markdown.render(parsed.content)
+      ...renderPostMarkdown(parsed.content)
     };
     if (!post.slug || post.draft) continue;
     posts.push(post);
