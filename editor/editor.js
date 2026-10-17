@@ -126,6 +126,22 @@ function renderSite() {
   const site = state.site; site.hero ||= {}; site.about ||= {}; site.defaults ||= {};
   panel.innerHTML = section('站点资料', '编辑 Hero、自我介绍和所有访客看到的默认视觉路径。', `<div class="form-grid">${field('Hero 小标题','hero.eyebrow',site.hero.eyebrow || '')}${field('主按钮文字','hero.primaryLabel',site.hero.primaryLabel || '')}${field('Hero 两行文字（每行一项）','hero.lines',(site.hero.lines || []).join('\n'),{type:'textarea',wide:true})}${field('关于页手写句','about.quote',site.about.quote || '',{type:'textarea',wide:true})}${field('个人介绍','about.text',site.about.text || '',{type:'textarea',wide:true})}${field('公共默认封面','defaults.cover',site.defaults.cover || '')}${field('公共默认背景','defaults.background',site.defaults.background || '')}</div>`);
   bindSiteFields();
+  const background = site.defaults.background || '';
+  const pending = state.pendingAssets.find(asset => asset.path === background);
+  const preview = pending?.objectUrl || (background.startsWith('assets/') ? `../${background}` : background);
+  panel.insertAdjacentHTML('beforeend', section('公共默认背景', '在这里上传或选择背景，点击发布后所有访问者都能看到。', `<div class="asset-grid">${preview ? `<article class="asset-card"><img src="${escapeHtml(preview)}" alt="公共默认背景预览"></article>` : '<p>尚未设置公共背景</p>'}</div><div class="publish-actions"><input id="public-bg-file" type="file" accept="image/*" hidden><button id="public-bg-upload" type="button">上传公共背景</button><button id="public-bg-library" type="button">从素材库选择</button><button id="public-bg-clear" type="button">清除公共背景</button></div>`));
+  panel.querySelector('#public-bg-upload').addEventListener('click', () => panel.querySelector('#public-bg-file').click());
+  panel.querySelector('#public-bg-library').addEventListener('click', () => { activeTab = 'assets'; render(); });
+  panel.querySelector('#public-bg-clear').addEventListener('click', () => mutate(() => { site.defaults.background = ''; }, true));
+  panel.querySelector('#public-bg-file').addEventListener('change', async event => {
+    const file = event.target.files[0];
+    if (!file) return;
+    const count = state.pendingAssets.length;
+    await uploadAssets([file]);
+    activeTab = 'site';
+    if (state.pendingAssets.length > count) mutate(() => { state.site.defaults.background = state.pendingAssets.at(-1).path; }, true);
+    else render();
+  });
 }
 
 function getPath(object, path) { return path.split('.').reduce((value, key) => value?.[key], object); }

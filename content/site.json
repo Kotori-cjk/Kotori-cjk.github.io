@@ -75,7 +75,7 @@
       "id": "x",
       "label": "X",
       "note": "social media",
-      "href": "https://x.com/KotoriMare",
+      "href": "https://x.com/marekotori",
       "icon": "x",
       "visible": true
     },
@@ -90,7 +90,7 @@
   ],
   "defaults": {
     "cover": "assets/uploads/1788017894154-140100396-p1-420b5b53.webp",
-    "background": ""
+    "background": "assets/uploads/homepage-background-koi.jpg"
   },
   "newsletter": {}
 }
