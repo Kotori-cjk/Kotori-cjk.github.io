@@ -9,7 +9,12 @@
   },
   "about": {
     "quote": "そして始まる、\nきみとはぐ、のセカイ!",
-    "text": "a second-grade pku undergraduate with keen interest in AI, ACGN and scientific novels. Welcome to contact me at 2500013578@stu.pku.edu.cn"
+    "text": "I'm Junkun Chen, a second-grade PKU undergraduate with keen interest in AI, ACGN and scientific novels. Welcome to contact me at 2500013578@stu.pku.edu.cn"
+  },
+  "newsletter": {
+    "username": "",
+    "title": "订阅博客来信",
+    "description": "新随笔发布时，我会发一封邮件告诉你。"
   },
   "interests": [
     {
@@ -89,8 +94,7 @@
     }
   ],
   "defaults": {
-    "cover": "assets/uploads/1788017894154-140100396-p1-420b5b53.webp",
+    "cover": "assets/uploads/1788017913286-146867220-p0-9d5da098.webp",
     "background": "assets/uploads/homepage-background-koi.jpg"
-  },
-  "newsletter": {}
+  }
 }

@@ -16,32 +16,5 @@
     "externalOnly": false,
     "order": 2,
     "visible": true
-  },
-  {
-    "id": "544247584",
-    "title": "Strawberries & Cigarettes",
-    "artist": "Troye Sivan",
-    "cover": "assets/uploads/music-544247584-e9ac15a5.webp",
-    "externalOnly": true,
-    "order": 3,
-    "visible": true
-  },
-  {
-    "id": "725698",
-    "title": "late in autumn",
-    "artist": "fripSide",
-    "cover": "assets/uploads/music-725698-59818735.webp",
-    "externalOnly": true,
-    "order": 4,
-    "visible": true
-  },
-  {
-    "id": "3407340933",
-    "title": "草笛ノ夢",
-    "artist": "VISUAL ARTS / Key",
-    "cover": "assets/uploads/music-3407340933-46a95234.webp",
-    "externalOnly": false,
-    "order": 5,
-    "visible": true
   }
 ]
