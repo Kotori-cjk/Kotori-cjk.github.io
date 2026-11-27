@@ -1,5 +1,5 @@
 import { SITE_CONFIG } from '../site-config.js';
-import { initStorage, getState, updateState, imageUrl, saveImage, removeImage, exportHomepage, importHomepage } from './storage.js';
+import { initStorage, getState, updateState, imageUrl, saveImage, removeImage, exportHomepage, importHomepage } from './storage.js?v=20261128-1';
 import { initRevealMotion, initBookIntro } from './motion.js?v=20260829-4';
 import { initPlayer } from './player.js?v=20260830-1';
 import { initRippleEffects } from './interactions.js?v=20260830-1';
@@ -135,4 +135,10 @@ async function init() {
 
 initRippleEffects();
 initBookIntro({ onOpen: () => window.scrollTo({ top: 0 }) });
-init().catch(error => { console.error(error); document.body.classList.remove('cover-closed'); document.body.classList.add('book-open'); });
+init().catch(error => {
+  console.error(error);
+  document.body.classList.remove('cover-closed');
+  document.body.classList.add('book-open');
+  document.getElementById('homepage')?.setAttribute('aria-hidden', 'false');
+  document.querySelectorAll('.reveal-section').forEach(el => el.classList.add('is-visible'));
+});

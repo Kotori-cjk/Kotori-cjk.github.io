@@ -14,13 +14,32 @@ let db;
 let state = structuredClone(defaultState);
 let images = {};
 
-function openDb() {
+function openDbWithVersion(version) {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, 1);
-    request.onupgradeneeded = event => event.target.result.createObjectStore(STORE_NAME);
-    request.onsuccess = event => { db = event.target.result; resolve(); };
+    const request = version == null ? indexedDB.open(DB_NAME) : indexedDB.open(DB_NAME, version);
+    request.onupgradeneeded = event => {
+      const target = event.target.result;
+      if (!target.objectStoreNames.contains(STORE_NAME)) target.createObjectStore(STORE_NAME);
+    };
+    request.onsuccess = event => resolve(event.target.result);
     request.onerror = event => reject(event.target.error);
   });
+}
+
+async function openDb() {
+  let database = await openDbWithVersion();
+  if (!database.objectStoreNames.contains(STORE_NAME)) {
+    const nextVersion = database.version + 1;
+    database.close();
+    database = await openDbWithVersion(nextVersion);
+  }
+  database.onversionchange = () => { database.close(); db = null; };
+  db = database;
+}
+
+async function ensureDb() {
+  if (!db) await openDb();
+  return db;
 }
 
 function readImages() {
@@ -37,18 +56,20 @@ function readImages() {
   });
 }
 
-function putImage(key, value) {
+async function putImage(key, value) {
+  const database = await ensureDb();
   return new Promise((resolve, reject) => {
-    const transaction = db.transaction(STORE_NAME, 'readwrite');
+    const transaction = database.transaction(STORE_NAME, 'readwrite');
     transaction.objectStore(STORE_NAME).put(value, key);
     transaction.oncomplete = resolve;
     transaction.onerror = event => reject(event.target.error);
   });
 }
 
-function deleteImageRecord(key) {
+async function deleteImageRecord(key) {
+  const database = await ensureDb();
   return new Promise((resolve, reject) => {
-    const transaction = db.transaction(STORE_NAME, 'readwrite');
+    const transaction = database.transaction(STORE_NAME, 'readwrite');
     transaction.objectStore(STORE_NAME).delete(key);
     transaction.oncomplete = resolve;
     transaction.onerror = event => reject(event.target.error);
@@ -137,9 +158,15 @@ async function importHomepage(file) {
 }
 
 export async function initStorage() {
-  await openDb();
-  images = await readImages();
   loadState();
+  try {
+    await openDb();
+    images = await readImages();
+  } catch (error) {
+    console.warn('IndexedDB unavailable, using default appearance', error);
+    db = null;
+    images = {};
+  }
   return state;
 }
 
