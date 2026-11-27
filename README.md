@@ -36,14 +36,13 @@
 
 ## 内容工作流
 
-```mermaid
-flowchart LR
-  E["本地内容编辑器 (/editor/)"] -->|IndexedDB 草稿与 WebP 压缩| G["Git Data API 原子提交"]
-  G -->|检查远程基线并写入 main| A["GitHub Actions (npm run build)"]
-  A -->|输出 dist/ 并发布| P["GitHub Pages (不含编辑器与代理)"]
-```
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/workflow-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="docs/workflow-light.svg">
+  <img src="docs/workflow-light.svg" alt="Kotori Homepage 内容工作流">
+</picture>
 
-所有公开内容均在本机 `/editor/` 中编排，草稿实时保存于 `IndexedDB`：
+主页所有公开内容（简介、兴趣、随笔、项目、链接、公共歌单与默认视觉）都会随构建完整上线，保证每位访问者都能看到完整主页；同时可在本地 `/editor/` 中整理并发布新内容（草稿自动存于 `IndexedDB`）：
 
 1. **网易云解析**：`npm run editor` 附带仅限本机访问的代理接口，粘贴歌曲链接即可自动识别曲名、歌手并下载封面。
 2. **安全鉴权发布**：发布时仅在页面内存中临时使用仅授权 `Kotori-cjk/Kotori-cjk.github.io`（`Contents: read/write`）的 fine-grained token，不落盘、不写入 URL 或仓库。
